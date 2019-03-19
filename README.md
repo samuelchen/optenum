@@ -19,7 +19,7 @@ Class MyOption(object):
 ```
 But how can we get the enum name foo ? How can we get the list of all enums ? Even list of tuples `[ (1, 'foo'), (2, 'bar')]` (useful in Django model)
 
-Although Python 3.7 comes with data classes[https://docs.python.org/3/whatsnew/3.7.html#whatsnew37-pep557]. So far it looks like a piece of syntax sugar for me and it can not solve these problems.
+Although Python 3.7 comes with [data classes](https://docs.python.org/3/whatsnew/3.7.html#whatsnew37-pep557). So far it looks like a piece of syntax sugar for me and it can not solve these problems.
 
 # Features
 

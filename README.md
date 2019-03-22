@@ -49,9 +49,14 @@ Although Python 3.7 comes with [data classes](https://docs.python.org/3/whatsnew
 
 `int`, `float` will be performed on `Option.code` and returns the value or raises corresponding exception.
 
-# Operatos
+# `Option` operators
 
-See doc [`operators.md`](./docs/operators.md)
+  `Option.code` is the real value of the enum/option item. Somehow we need to use codes 
+  like `if active_state == MyOption.RUNNING.code:  # Do something ...` to check the status. For convenience using it, some of the operators
+  are override. Then we could use `if active_state == MyOption.RUNNING:`, `x = MyOption.RUNNING + 1` and so on to
+  directly reference to its real value.
+  
+  See doc [operators.md](./docs/operators.md) for override operators.
   
 # Contributors
 

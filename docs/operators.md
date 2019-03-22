@@ -1,5 +1,9 @@
-# Supported Operators
+# Supported `Option` Operators
 
+  `Option.code` is the real value of the enum/option item. Somehow we need to use codes 
+  like `if active_state == MyOption.RUNNING ...` to check the status. For convenience using it, some of the operators
+  are override. 
+  
   To give example for operators, the following options (Fruit and Balls) will be used.
   
   ```python

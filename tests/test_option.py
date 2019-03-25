@@ -40,6 +40,11 @@ class TestOption(unittest.TestCase):
         self.assertRaises(TypeError, Option, *([1, 2, 3], ))
         self.assertRaises(TypeError, Option, *({'foo': 'bar'}, ''))
 
+    def test_option_code_name(self):
+        self.assertRaises(ValueError, Option, *(None, 'FOO'))
+        self.assertRaises(ValueError, Option, *(1, None))
+        self.assertRaises(ValueError, Option, *(None, None, 'bar'))
+
     def test_option_name_text(self):
         opt = Option('O', 'OPEN', 'Opened')
         self.assertIs(opt.code, 'O')

@@ -13,7 +13,7 @@ class Option(object):
     """Not defined option."""
 
     NUMBER_TYPES = six.integer_types + (float, )
-    DATE_TYPES = (datetime, date, time)
+    DATE_TYPES = ()    # (datetime, date, time)
 
     AVAILABLE_CODE_TYPES = six.string_types + NUMBER_TYPES + DATE_TYPES
     AVAILABLE_CODE_TYPES_STR = ', '.join(t.__name__ for t in AVAILABLE_CODE_TYPES)
@@ -36,6 +36,9 @@ class Option(object):
 
             if not (name[0].isalpha() and is_identifier(name) and name.isupper()):
                 raise ValueError('Option name must be alphanumeric or "_"  in uppercase and start with alphabet.')
+
+        if not ((code is None and name is None and text is None) or (code is not None and name is not None)):
+            raise ValueError('Option code and name must be not None unless code, name and text are all None.')
 
         self.__code = code
         self.__name = name
@@ -61,6 +64,13 @@ class Option(object):
     def text(self):
         """The description of the option/enum entry. It's used to display. Can be i18n."""
         return self.__text
+
+    def get_text(self):
+        """
+        Returns `text` of the option. If `text` is None, returns `name` in lower case as text.
+        If name is also None, return `None` object converted string.
+        """
+        return str(None) if self.name is None else self.name.lower() if self.text is None else self.text
 
     def __repr__(self):
         return "<%s code=%s name=%s text=%s>" % (self.__class__.__name__, self.code, self.name, self.text)

@@ -1,6 +1,6 @@
 # Optenum
 
-A missing python Option/Enum libary which supports enum code, name, text, even (code, name) tuple list and so on.
+A missing Python Option/Enum libary which supports enum code, name, text, even (code, name) tuple list and so on.
 
 Name "**optenum**" comes from '**opt**ion' + '**enum**eration'.
 
@@ -9,14 +9,57 @@ Compatible with `Python 2.7+` and `Python 3.0+`.
 
 # Quick start
 
-``` To be written
+1. Simple as Enum type
+
+Says we define a simple enum:
+
+```python
+class Fruit(Options):
+    APPLE = 1
+    ORANGE = 2
+    BANANA = 3 
 ```
 
+Try the following in Python command line:
+
+
+``` python
+>>> from optenum import Option, Options
+>>> class Fruit(Options):
+...     APPLE = 1
+...     ORANGE = 2
+...     BANANA = 3
+>>> 
+>>> Fruit.APPLE
+<Option code=1 name=APPLE text=None>
+>>> print(Fruit.APPLE)
+1
+>>> Fruit.APPLE.code
+1
+>>> Fruit.APPLE.name
+'APPLE'
+>>> Fruit.APPLE.text
+>>> print(Fruit.APPLE.text)
+None
+>>> Fruit.APPLE.get_text()
+'apple'
+
+```
+
+2. Operators
+
+3. List
+
+4. Django model choices
+
+
+
 # Background
-Ofen we need to define some enums or options. But looks python missing this class.
+
+Often we need to define some enums or options. But looks python missing this class.
 Sometimes we uses class, tuples or dict as the replacement. But they are not convenience.
 
-For example, we use class as enum. We can use `MyOption.foo` to get the enum value `1`.
+For example, we could define a class as enumeration. We can use `MyOption.foo` to get the enum value `1`.
 ```
 Class MyOption(object):
     foo = 1
@@ -28,20 +71,20 @@ Although Python 3.7 comes with [data classes](https://docs.python.org/3/whatsnew
 
 # Features
 
-  * Code - Enumration/option by different types - e.g. 0, 1, -1 (or 'new', 'running', 'stopped')
+  * Code - Enumeration/options by different types - e.g. 0, 1, -1 (or 'new', 'running', 'stopped')
   * Name - Name of an enum/option - e.g.  'NEW', 'RUNNING', 'STOPPED'. Support dot access. 
   * Text - Meaning or description of the enum/option. support i18n - e.g. _('new'), _('running'), _('stopped') (translated to '新建', '运行中', ‘停止中’)
   * List - Retrieve list of code, name or text `[0, 1, -1]`
   * Dict - Retrieve dict of `{code: name}` mapping. even `{code: text}`, `{name: text}` mapping if required.
   * List of tuples - Retrieve list of `[(code, name), ...]` tuples. Useful in **Django** model.
   * Operators support - e.g. `EnumFruits.APPLE == 1`, `EnumFruits.BANANA > EnumFruits.APPLE`
-  * Grouping - Group a set of enums/options. e.g. IN_PROGERSS_STATE = ['STARTING', 'STOPPING'], but 'STARTED' and 'STOPPED' are not belongs to it.
+  * Grouping - Group a set of enums/options. e.g. IN_PROGRESS_STATE = ['STARTING', 'STOPPING'], but 'STARTED' and 'STOPPED' are not belongs to it.
   * Access **name**, **text** by **code**
   * Lookup enum/option by **name**, **code**
   
 # Guide / Tutor
 
-# Converting
+# Type converting for `Option`
 
 `str()` or implicit string converting will convert `Option.code` to string type and returns.
 
@@ -49,15 +92,30 @@ Although Python 3.7 comes with [data classes](https://docs.python.org/3/whatsnew
 
 `int`, `float` will be performed on `Option.code` and returns the value or raises corresponding exception.
 
-# `Option` operators
+# Boolean for `Option`
 
-  `Option.code` is the real value of the enum/option item. Somehow we need to use codes 
-  like `if active_state == MyOption.RUNNING.code:  # Do something ...` to check the status. For convenience using it, some of the operators
-  are override. Then we could use `if active_state == MyOption.RUNNING:`, `x = MyOption.RUNNING + 1` and so on to
-  directly reference to its real value.
-  
-  See doc [operators.md](./docs/operators.md) for override operators.
+`bool`
+`is`
+
+# Operators for `Option`
+
+`Option.code` is the real value of the enum/option item. Somehow we need to use codes 
+like `if active_state == MyOption.RUNNING.code:  # Do something ...` to check the status. For convenience using it, some of the operators
+are override. Then we could use `if active_state == MyOption.RUNNING:`, `x = MyOption.RUNNING + 1` and so on to
+directly reference to its real value.
+
+See doc [operators.md](./docs/operators.md) for override operators.
+
+# Iteration for `Options`
+
+`in`
+
+`for` each
+
+
   
 # Contributors
 
-Samuel Chen - Author.
+List of contributors:
+
+* Samuel Chen - The project owner and maintainer.

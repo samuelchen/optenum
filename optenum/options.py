@@ -4,19 +4,22 @@ Options represents an set of option items (enumerations). It is a list of option
 
 import six
 from .option import Option
+import logging
+
+log = logging.getLogger(__name__)
 
 
-class OptionGroup(object):
-
-    def __init__(self, *options):
-        group = []
-        for opt in options:
-            group.append(opt)
-
-        self._group = group
-
-    def get_option_list(self):
-        return self._group
+# class OptionGroup(object):
+#
+#     def __init__(self, *options):
+#         group = []
+#         for opt in options:
+#             group.append(opt)
+#
+#         self._group = group
+#
+#     def get_option_list(self):
+#         return self._group
 
 
 class OptionsMeta(type):
@@ -25,22 +28,28 @@ class OptionsMeta(type):
         instance = super(OptionsMeta, cls).__new__(cls, name, bases, namespace)
         name_options_mapping = {}
         code_options_mapping = {}
-        groups_mapping = {}
+        # groups_mapping = {}
+
+        ignore_invalid_name = getattr(cls, '__IGNORE_INVALID_NAME__', False) is True
 
         if name != 'Options':
             for attr, val in namespace.items():
                 if attr.startswith('_'):
                     continue
                 elif not attr.isupper():
-                    raise AttributeError('Option name must be uppercase. "%s" is not uppercase.' % attr)
+                    if callable(val) or isinstance(val, (staticmethod, classmethod, property)):
+                        pass    # function
+                    else:
+                        if not ignore_invalid_name:
+                            raise AttributeError('Option name must be uppercase. Attribute "%s" is not.' % attr)
                 else:
-                    if attr in name_options_mapping.keys():
-                        raise AttributeError('Duplicate option "%s" found' % attr)
+                    if attr in name_options_mapping.keys() or hasattr(cls, attr):
+                        raise AttributeError('Duplicated attribute "%s" found' % attr)
 
-                    if isinstance(val, OptionGroup):
-                        groups_mapping[attr] = val
-                        setattr(cls, attr, val.get_option_list())
-                        continue
+                    # if isinstance(val, OptionGroup):
+                    #     groups_mapping[attr] = val
+                    #     setattr(cls, attr, val.get_option_list())
+                    #     continue
 
                     if isinstance(val, Option):
                         if val.name != attr:
@@ -56,11 +65,14 @@ class OptionsMeta(type):
                             opt = Option(code=val[0], name=attr, text=str(val[1]))
                         else:
                             raise ValueError('Option code can only be (code, text) tuple or list. name is not needed.')
-                    else:
+                    elif isinstance(val, Option.AVAILABLE_CODE_TYPES):
                         opt = Option(code=val, name=attr)
+                    else:
+                        raise AttributeError('"%s" is uppercase attribute but its value can not be converted to Option.'
+                                             % attr)
 
-                    if opt.code in code_options_mapping:
-                        raise ValueError('Duplicate code "%s" found' % opt.code)
+                    if opt.code in code_options_mapping.keys():
+                        raise ValueError('Duplicated code "%s" found' % opt.code)
 
                     setattr(instance, attr, opt)
                     name_options_mapping[attr] = opt
@@ -96,7 +108,7 @@ class Options(object):
     __order_by_code = 'code'
     __order_by_name = 'name'
 
-    _G = OptionGroup
+    # _G = OptionGroup
 
     @classmethod
     def __get_name_options_mapping(cls):

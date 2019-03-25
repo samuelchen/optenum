@@ -20,7 +20,41 @@ class DoorStates(Options):
     IN_OPENING = 'IO'
     IN_CLOSING = 'IC'
 
-    IN_PROGRESS_STATUS = Options._G(IN_OPENING, IN_CLOSING)
+    # IN_PROGRESS_STATUS = Options._G(IN_OPENING, IN_CLOSING)
+
+    _FLAG = False           # underscore leading name is not an option
+
+    x = lambda y: y
+
+    # None uppercase name for classmethod is available.
+    @classmethod
+    def toggle(cls, status):
+        if status is cls.OPEN:
+            return cls.CLOSED
+        elif status is cls.CLOSED:
+            return cls.OPEN
+        elif status is cls.IN_OPENING:
+            return cls.IN_CLOSING
+        else:
+            return cls.IN_OPENING
+
+    # None uppercase name for staticmethod is available.
+    @staticmethod
+    def Foo():
+        pass
+
+    # None uppercase name for property is available.
+    @property
+    def bar(self):
+        return ''
+
+    @bar.setter
+    def bar(self, val):
+        pass
+
+    # None uppercase name for function is available.
+    def baz(self):
+        pass
 
 
 class TestCustomizedOptions(unittest.TestCase):

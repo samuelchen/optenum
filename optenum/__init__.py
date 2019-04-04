@@ -25,7 +25,7 @@ from .version import __version__
 from .option import Option
 from .options import Options
 
-__all__ = ('Option', 'Options')
+__all__ = ('Option', 'Options', '__version__')
 
 __copyright__ = "Copyright (c) 2019 Samuel Chen (Chen Wei)"
 __license__ = "MIT"

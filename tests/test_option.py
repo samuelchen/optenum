@@ -25,6 +25,11 @@ class Ball(object):
     PING_PONG = Option('P', 'PING_PONG')
 
 
+class Favorite(object):
+    APPLE = Option(1, 'APPLE', 'Apple')
+    BANANA = Option(2, 'BANANA', 'Banana')
+
+
 class TestOption(unittest.TestCase):
 
     def test_not_defined(self):
@@ -68,11 +73,19 @@ class TestOption(unittest.TestCase):
         options = [Fruit.BANANA, Fruit.APPLE, Fruit.ORANGE]
         options = sorted(options)
         self.assertIs(options[0], Fruit.APPLE)
+        #
+        # if six.PY2:
+        #     self.assertEqual(Fruit.BANANA.__cmp__(Fruit.ORANGE), 1)
+        #     self.assertEqual(Fruit.APPLE.__cmp__(CellPhone.APPLE), 0)
+        #     self.assertEqual(Fruit.BANANA.__cmp__(Favorite.APPLE), -1)
 
     def test_op_eq(self):
         self.assertEqual(Fruit.APPLE, 1)
         self.assertEqual(CellPhone.APPLE, 1)
-        self.assertEqual(Fruit.APPLE, CellPhone.APPLE)
+        self.assertEqual(Fruit.APPLE, Favorite.APPLE)
+        self.assertNotEqual(Fruit.BANANA, Favorite.BANANA)
+        self.assertNotEqual(Fruit.APPLE, CellPhone.APPLE)
+        self.assertEqual(Fruit.APPLE.code, CellPhone.APPLE.code)
 
     def test_op_lt(self):
         self.assertLess(Fruit.APPLE, 2)

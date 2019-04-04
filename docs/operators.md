@@ -7,7 +7,10 @@
   To give example for operators, the following options (Fruit and Balls) will be used.
   
   ```python
-  
+
+# Here it inherits from "object" for simple example. 
+# Better to use "Options" as parent class to leverage the features.
+
 class Fruit(object):
     APPLE = Option(1, 'APPLE', 'Apple')
     ORANGE = Option(2, 'ORANGE', 'Orange')
@@ -23,7 +26,11 @@ class Ball(object):
     PING_PONG = Option('P', 'PING_PONG')
     TENNIS = Option('10', 'TENNIS')
     
-    
+class CellPhone(object):
+    APPLE = Option(1, 'APPLE', 'iPhone')
+    HUAWEI = Option(2, 'HUAWEI', 'Honer')
+    SAMSUNG = Option(3, 'SAMSUNG', 'Galaxy')
+
   ```
 
 ## Math operators
@@ -360,9 +367,56 @@ TypeError: 'abs' not supported on instances of 'Option(str)'
 
 Logic operators are not override. They will perform as the object logic operators. 
 
-  * and
+  * equal == (and !=)
+    
+  When comparing between 2 `Option` objects, it will compare `code`, `name` and `text`.
+  Only if 3 fields are all same, it will returns `True`, otherwise returns `False`.
+  
+  Here I add a new class for example
+    
+  ```python
+    class Favorite(object):
+        APPLE = Option(1, 'APPLE', 'Apple')
+        BANANA = Option(2, 'BANANA', 'Banana')
+  ```
 
-  * or
+  You will see the difference.
+    
+  ```python
+    >>> Fruit.APPLE == Favorite.APPLE
+    True
+    >>> Fruit.APPLE is Favorite.APPLE
+    False
+    >>> Fruit.BANANA == Favorite.BANANA
+    False
+    >>> Fruit.BANANA != Favorite.BANANA
+    True
+  ```
+  
+  * cmp (Python 2)
+  
+        Commented as its not required in Python 2.7 and 3
+
+  __cmp__ is only used in Python 2. `!=`, or `sort` will use `__cmp__` to compare objects.
+  
+  Comparing 2 `Option` objects means to compares their `code`.
+  Comparing an `Option` objects with another type object means to compare the `Option.code` to the other object.
+  
+  * Greater(Equal), Less(Equal), >, >=, <, <=
+  
+  Comparing 2 `Option` objects means to compares their `code`.
+  Comparing an `Option` objects with another type object means to compare the `Option.code` to the other object.
+
+  * and, or
+  
+  No special implementation for `and` and `or` operators. It behaviors as its.
+  
+  ```python
+    >>> Fruit.APPLE and Favorite.BANANA
+    <Option code=2 name=BANANA text=Banana>
+    >>> Fruit.APPLE or Favorite.BANANA
+    <Option code=1 name=APPLE text=Apple>
+  ```
 
 ## Bit Operators
 

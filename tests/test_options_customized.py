@@ -2,7 +2,7 @@ import unittest
 from optenum import Option, Options
 
 
-class EnumFruits(Options):
+class Fruit(Options):
     APPLE = 1
     ORANGE = 2
     BANANA = 3
@@ -14,7 +14,7 @@ class EnumCellPhone(Options):
     HUAWEI = (3, 'Huawei cellphone')
 
 
-class DoorStates(Options):
+class DoorState(Options):
     OPEN = 'O', 'Door is opened'
     CLOSED = ('C', 'Door is closed')
     IN_OPENING = 'IO'
@@ -60,16 +60,16 @@ class DoorStates(Options):
 class TestCustomizedOptions(unittest.TestCase):
 
     def test_enum(self):
-        self.assertEqual(EnumFruits.APPLE, 1)
-        self.assertEqual(EnumFruits.APPLE.name, 'APPLE')
-        self.assertLess(EnumFruits.ORANGE, EnumFruits.BANANA)
+        self.assertEqual(Fruit.APPLE, 1)
+        self.assertEqual(Fruit.APPLE.name, 'APPLE')
+        self.assertLess(Fruit.ORANGE, Fruit.BANANA)
 
         self.assertEqual(EnumCellPhone.SAMSUNG, 2)
 
         self.assertEqual(EnumCellPhone.HUAWEI.text, 'Huawei cellphone')
 
-        self.assertEqual(EnumFruits.APPLE, EnumCellPhone.APPLE)
-        self.assertIsNot(EnumFruits.APPLE, EnumCellPhone.APPLE)
+        self.assertEqual(Fruit.APPLE, EnumCellPhone.APPLE)
+        self.assertIsNot(Fruit.APPLE, EnumCellPhone.APPLE)
 
     def test_invalid_definition(self):
         try:
@@ -103,107 +103,96 @@ class TestCustomizedOptions(unittest.TestCase):
         except Exception as e:
             self.assertIsInstance(e, ValueError)
 
-    def test_lookup_by_code(self):
-        opt = EnumFruits.lookup_by_code(3)
-        self.assertIsInstance(opt, Option)
-        self.assertEqual(EnumFruits.BANANA, opt)
-        self.assertEqual(EnumFruits.BANANA, opt.code)
-        self.assertEqual(opt.code, EnumFruits.BANANA)
+    def test_get_item(self):
+        self.assertEqual('O', DoorState['OPEN'])
+        self.assertEqual(DoorState.OPEN, DoorState['OPEN'])
+        self.assertEqual(DoorState.OPEN, DoorState[DoorState.OPEN.name])
+        self.assertEqual('C', DoorState.get('CLOSED'))
+        self.assertEqual('IC', DoorState.get('IN_CLOSING'))
+        self.assertEqual(Option.NOT_DEFINED, DoorState.get('Foo'))
+        self.assertEqual(None, DoorState.get('Foo'))
+        self.assertRaises(KeyError, DoorState.__getitem__, ('FOO',))
+        self.assertRaises(KeyError, DoorState.__getitem__, (DoorState.OPEN,))
+        self.assertRaises(TypeError, DoorState.__setitem__, ('FOO', 'bar'))
 
-    def test_lookup_by_name(self):
-        opt = EnumFruits.lookup_by_name('ORANGE')
-        self.assertIsInstance(opt, Option)
-        self.assertEqual(EnumFruits.ORANGE, opt)
-        self.assertEqual(EnumFruits.ORANGE, opt.code)
-        self.assertEqual(opt.code, EnumFruits.ORANGE)
-
-    def test_get_code_list(self):
-        codes = EnumFruits.get_code_list()
+    def test_collection_codes(self):
+        codes = Fruit.codes
         self.assertIsInstance(codes, list)
         self.assertIn(1, codes)
         self.assertIn(2, codes)
         self.assertIn(3, codes)
         self.assertEqual(len(codes), 3)
 
-        order_by = EnumFruits.get_order_by_kw_name()       # "name"
-        codes = EnumFruits.get_code_list(order_by=order_by)
-        self.assertEqual(codes[0], 1)
-        self.assertEqual(codes[1], 3)
-        self.assertEqual(codes[2], 2)
-        self.assertEqual(len(codes), 3)
-
-        order_by = EnumFruits.get_order_by_kw_code()       # "code"
-        codes = EnumFruits.get_code_list(order_by=order_by, reverse=True)
-        self.assertEqual(codes[0], 3)
-        self.assertEqual(codes[1], 2)
-        self.assertEqual(codes[2], 1)
-        self.assertEqual(len(codes), 3)
-
-    def test_get_name_list(self):
-        names = EnumFruits.get_name_list()
+    def test_collection_names(self):
+        names = Fruit.names
         self.assertIsInstance(names, list)
         self.assertIn('APPLE', names)
         self.assertIn('ORANGE', names)
         self.assertIn('BANANA', names)
         self.assertEqual(len(names), 3)
 
-        order_by = EnumFruits.get_order_by_kw_name()       # "name"
-        names = EnumFruits.get_name_list(order_by=order_by)
-        self.assertEqual(names[0], 'APPLE')
-        self.assertEqual(names[1], 'BANANA')
-        self.assertEqual(names[2], 'ORANGE')
-        self.assertEqual(len(names), 3)
-
-        order_by = EnumFruits.get_order_by_kw_code()       # "code"
-        names = EnumFruits.get_name_list(order_by=order_by, reverse=True)
-        self.assertEqual(names[0], 'BANANA')
-        self.assertEqual(names[1], 'ORANGE')
-        self.assertEqual(names[2], 'APPLE')
-        self.assertEqual(len(names), 3)
-
-    def test_get_code_name_list(self):
-        lst = EnumFruits.get_code_name_list()
+    def test_collection_all(self):
+        lst = Fruit.all
         self.assertIsInstance(lst, list)
-        self.assertIn((1, 'APPLE'), lst)
-        self.assertIn((2, 'ORANGE'), lst)
-        self.assertIn((3, 'BANANA'), lst)
         self.assertEqual(len(lst), 3)
+        self.assertIn(Fruit.APPLE, lst)
+        self.assertIn(Fruit.ORANGE, lst)
+        self.assertIn(Fruit.BANANA, lst)
 
-        order_by = EnumFruits.get_order_by_kw_name()       # "name"
-        lst = EnumFruits.get_code_name_list(order_by=order_by, code_first=False)
-        self.assertEqual(lst[0], ('APPLE', 1))
-        self.assertEqual(lst[1], ('BANANA', 3))
-        self.assertEqual(lst[2], ('ORANGE', 2))
-        self.assertEqual(len(lst), 3)
-
-        order_by = EnumFruits.get_order_by_kw_code()       # "code"
-        lst = EnumFruits.get_code_name_list(order_by=order_by, reverse=True, code_first=False)
-        self.assertEqual(lst[0], ('BANANA', 3))
-        self.assertEqual(lst[1], ('ORANGE', 2))
-        self.assertEqual(lst[2], ('APPLE', 1))
-        self.assertEqual(len(lst), 3)
-
-    def test_get_code_text_list(self):
-        lst = DoorStates.get_code_text_list()
+    def test_collection_tuples(self):
+        lst = Fruit.tuples
         self.assertIsInstance(lst, list)
-        self.assertIn(('O', 'Door is opened'), lst)
-        self.assertIn(('C', 'Door is closed'), lst)
-        self.assertEqual(len(lst), 4)
+        self.assertEqual(len(lst), 3)
+        val = lst[0]
+        self.assertIsInstance(val, tuple)
+        self.assertIn(('APPLE', 1, None), lst)
+        self.assertIn(('ORANGE', 2, None), lst)
+        self.assertIn(('BANANA', 3, None), lst)
 
-        order_by = DoorStates.get_order_by_kw_name()       # "name"
-        lst = DoorStates.get_code_text_list(order_by=order_by)
-        self.assertEqual(lst[0], ('C', 'Door is closed'))
-        self.assertEqual(lst[1], ('IC', None))
-        self.assertEqual(lst[3], ('O', 'Door is opened'))
-        self.assertEqual(len(lst), 4)
+    def test_collection_items(self):
+        items = Fruit.items
+        self.assertIsInstance(items, dict)
+        self.assertEqual(len(items), 3)
+        self.assertIn('APPLE', items)
+        self.assertIn(Fruit.ORANGE, items.values())
+        self.assertIn(Fruit.BANANA.name, items.keys())
 
-        order_by = DoorStates.get_order_by_kw_code()       # "code"
-        lst = DoorStates.get_code_text_list(order_by=order_by, reverse=True, code_first=False)
-        self.assertEqual(lst[0], ('Door is opened', 'O'))
-        self.assertEqual(lst[1], (None, 'IO'))
-        self.assertEqual(lst[2], (None, 'IC'))
-        self.assertEqual(lst[3], ('Door is closed', 'C'))
-        self.assertEqual(len(lst), 4)
+    def test_get_list(self):
+        lst = Fruit.get_list('code')
+        self.assertIsInstance(lst, list)
+        self.assertIn(Fruit.APPLE, lst)
+        self.assertEqual(len(lst), 3)
+
+        lst = Fruit.get_list('name')
+        self.assertIsInstance(lst, list)
+        self.assertIn(Fruit.APPLE.name, lst)
+
+        lst = Fruit.get_list('name', 'text')
+        self.assertIsInstance(lst, list)
+        self.assertEqual(len(lst), 3)
+        name, text = lst[0]
+        self.assertIn(name, Fruit.names)
+
+        lst = Fruit.get_list('code', 'name', 'text')
+        self.assertIsInstance(lst, list)
+        self.assertEqual(len(lst), 3)
+        code, name, text = lst[0]
+        self.assertIn(code, Fruit)
+
+    def test_get_dict(self):
+        items = Fruit.get_dict('code', 'name')
+        self.assertIsInstance(items, dict)
+        self.assertIn(Fruit.APPLE.code, items)
+        self.assertEqual(len(items), 3)
+
+        items = Fruit.get_dict('name', 'code', 'text')
+        self.assertIsInstance(items, dict)
+        self.assertIn(Fruit.APPLE.name, items)
+        self.assertEqual(len(items), 3)
+        apple = items.get(Fruit.APPLE.name)
+        self.assertIsInstance(apple, tuple)
+        self.assertEqual(len(apple), 2)
+        self.assertIn(Fruit.APPLE, apple)
 
 
 if __name__ == '__main__':

@@ -1,58 +1,122 @@
 # Optenum
 
-A missing Python Option/Enum libary which supports enum code, name, text, even (code, name) tuple list and so on.
+A missing Python Option/Enum library which supports enum code, name, text, even (code, name) tuple list and so on.
 
 Name "**optenum**" comes from '**opt**ion' + '**enum**eration'.
 
 Compatible with `Python 2.7+` and `Python 3.0+`.
 
-
 # Quick start
 
 1. Simple as Enum type
 
-Says we define a simple enum:
+    Says we define a simple enum:
+    
+    ```python
+    from optenum import Options
+ 
+    class Fruit(Options):
+        APPLE = 1
+        ORANGE = 2
+        BANANA = 3 
+    ```
+    
+    Try the following in Python command line:
+    
+    ```
+    >>> from optenum import Option, Options
+    >>> class Fruit(Options):
+    ...     APPLE = 1
+    ...     ORANGE = 2
+    ...     BANANA = 3
+    >>> 
+    >>> Fruit.APPLE
+    <Option code=1 name=APPLE text=None>
+    >>> print(Fruit.APPLE)
+    1
+    >>> Fruit.APPLE.code
+    1
+    >>> Fruit.APPLE.name
+    'APPLE'
+    >>> Fruit.APPLE.text
+    >>> print(Fruit.APPLE.text)
+    None
+    >>> Fruit.APPLE.get_text()
+    'apple'
+    
+    ```
 
-```python
-class Fruit(Options):
-    APPLE = 1
-    ORANGE = 2
-    BANANA = 3 
-```
+2. Complex declaration
 
-Try the following in Python command line:
+    You may declare your Options (Enums) in many annotations.
 
+    ```python
+    from optenum import Option, Options
+ 
+    class EnumCellPhone(Options):
+        APPLE = 1
+        SAMSUNG = Option(2, name='SAMSUNG')
+        HUAWEI = 3, 'Huawei cellphone'
+    
+    
+    class DoorState(Options):
+        OPEN = 'O', 'Door is opened'
+        CLOSED = ('C', 'Door is closed')
+        IN_OPENING = 'IO'
+        IN_CLOSING = 'IC'
+    
+        _FLAG = False           # underscore leading name is not an option
+        x = lambda y: y         # function/callable is not an option
+    ```
 
-``` python
->>> from optenum import Option, Options
->>> class Fruit(Options):
-...     APPLE = 1
-...     ORANGE = 2
-...     BANANA = 3
->>> 
->>> Fruit.APPLE
-<Option code=1 name=APPLE text=None>
->>> print(Fruit.APPLE)
-1
->>> Fruit.APPLE.code
-1
->>> Fruit.APPLE.name
-'APPLE'
->>> Fruit.APPLE.text
->>> print(Fruit.APPLE.text)
-None
->>> Fruit.APPLE.get_text()
-'apple'
+3. Operators
 
-```
+    `Option` support some operators. See more in [operators.md](./docs/operators.md).
+    
+    ```
+    >>> class Favorite(Options):
+    ...     APPLE = 1
+    ...     BANANA = 3, 'Banana hot'
+    ... 
+    >>> 
+    >>> Fruit.APPLE == Favorite.APPLE
+    True
+    >>> Fruit.BANANA == Favorite.BANANA
+    False
+    >>> Fruit.APPLE + 1 == Fruit.ORANGE
+    True>>> Fruit.BANANA >> 2
+    0
+    >>> Fruit.BANANA << 2
+    12>>> Fruit.BANANA > Favorite.APPLE
+    True
+    ```
 
-2. Operators
+4. Collections
 
-3. List
+    `Options` provides some collections for accessing option and it's fields.
+    See section "Collections for Options" below for more information.
+    
+    ```
+    >>> Fruit.codes
+    [1, 2, 3]
+    >>> Fruit.names
+    ['ORANGE', 'APPLE', 'BANANA']
+    >>> Fruit.all
+    [<Option code=2 name=ORANGE text=None>, <Option code=1 name=APPLE text=None>, <Option code=3 name=BANANA text=None>]
+    >>> Fruit.tuples
+    [('ORANGE', 2, None), ('APPLE', 1, None), ('BANANA', 3, None)]
+    >>> Favorite.items
+    {'APPLE': <Option code=1 name=APPLE text=None>, 'BANANA': <Option code=3 name=BANANA text=Banana hot>}
+    >>> Favorite.get_list('code','text')
+    [(1, None), (3, 'Banana hot')]
+    >>> Favorite.get_dict('name','text')
+    {'APPLE': None, 'BANANA': 'Banana hot'}
+    
+    ```
 
-4. Django model choices
+5. Django model choices
 
-
+        To be written
 
 # Background
 
@@ -60,8 +124,9 @@ Often we need to define some enums or options. But looks python missing this cla
 Sometimes we uses class, tuples or dict as the replacement. But they are not convenience.
 
 For example, we could define a class as enumeration. We can use `MyOption.foo` to get the enum value `1`.
-```
-Class MyOption(object):
+
+```python
+class MyOption(object):
     foo = 1
     bar = 2
 ```
@@ -77,7 +142,7 @@ Although Python 3.7 comes with [data classes](https://docs.python.org/3/whatsnew
   * List - Retrieve list of code, name or text `[0, 1, -1]`
   * Dict - Retrieve dict of `{code: name}` mapping. even `{code: text}`, `{name: text}` mapping if required.
   * List of tuples - Retrieve list of `[(code, name), ...]` tuples. Useful in **Django** model.
-  * Operators support - e.g. `EnumFruits.APPLE == 1`, `EnumFruits.BANANA > EnumFruits.APPLE`
+  * Operators support - e.g. `Fruit.APPLE == 1`, `Fruit.BANANA > Fruit.APPLE`
   * Grouping - Group a set of enums/options. e.g. IN_PROGRESS_STATE = ['STARTING', 'STOPPING'], but 'STARTED' and 'STOPPED' are not belongs to it.
   * Access **name**, **text** by **code**
   * Lookup enum/option by **name**, **code**
@@ -106,14 +171,93 @@ directly reference to its real value.
 
 See doc [operators.md](./docs/operators.md) for override operators.
 
-# Iteration for `Options`
+# Collections for `Options`
 
-`in`
+Option can be accessed directly as subscribe annotation. For example `Option['FOO']`
+equals to `Option.FOO`.
 
-`for` each
+We could also access the following collections from within an Options class. 
 
-
+  * `Options.codes` - list of codes
+    
+  * `Options.names` - list of names
   
+  * `Options.all` - list of options
+
+  * `Options.tuples` - list of (`name`, `code`, `text`) tuple
+
+  * `Options.items` - dict of {`name`: `Option`} mapping
+
+  * `Options.get_list(*fields)` - list of *files tuple. *fields are names of Option filed 
+  such as `code`, *(`name`, `code`) or *(`code`, `name`, `text`)
+  
+  * `Options.get_dict(key_field, *fields)` - dict of `{key_filed: (*fields)}` (`{str: tuple}`) mapping.
+  `key_field` specify which Option field is key such as `name`, `code`. 
+  `fields` specify the value tuple combined of which Option fields such as (`name`, `text`) or `name`.
+  if fields is tuple, the value is tuple. if fields is single filed, value is single field.
+
+`in` operator could check if a `code` in `Options`. e.g. `if Fruit.APPLE in Fruit`.
+The `Option.name` will not work. e.g. `if 'APPLE' in Fruit` will got `False`. 
+If you want to check if name in `Options`), use collection instead. 
+e.g. `if 'APPLE' in Fruit.names`.
+
+
+# Configuration
+
+Some flags can be used to make some simple configuration to your Options.
+
+  * `__IGNORE_INVALID_NAME__` - Ignore invalid `Option` name so that you may add your own attribute/function to class.
+  
+    Underscore `_` leading attributes and any functions will be ignored so that you can add your own attributes and 
+    functions. The following example is valid definition.
+    
+    ```
+    Class MyEnum(Options):
+        FOO = 1
+        BAR = 2
+        
+        _flag = False
+        
+        def switch(self):
+            pass
+    ```
+    
+    But if an attributes is not uppercase (all characters), it will be treat as invalid `Option` and cause exception.
+    
+    ```
+    Class MyEnum(Options):
+        FOO = 1
+        BAR = 2
+        
+        Baz = 3     # <- Invalid Option name. Exception raised.
+    ```
+    
+    If you want this available, add `__IGNORE_INVALID_NAME__` to your class like below. The exception will ignored.
+    But to be noticed, it still not an `Option`.
+  
+    ```
+    Class MyEnum(Options):
+        __IGNORE_INVALID_NAME__ = True
+        
+        FOO = 1
+        BAR = 2
+        
+        Baz = 3     # <- Exception ignored. But still not an Option.
+    ```
+  
+  * `__ORDER_BY__`
+  
+        Not supported yet
+
+# FAQ
+
+* Why not use *namedtuple* ?
+
+*namedtuple* is also a good way to define enum/options. But it has not enough features
+you may required such as *collection*, *operator*, *compare*, *text* and so on.
+
+* To be added
+
 # Contributors
 
 List of contributors:

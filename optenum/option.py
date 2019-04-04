@@ -46,7 +46,6 @@ class Option(object):
 
         self.__code_type = type(code)
 
-
     @property
     def code(self):
         """The real value of an option or enum entry."""
@@ -97,19 +96,38 @@ class Option(object):
             pass
         elif isinstance(other, six.string_types) and isinstance(self.code, six.string_types):
             pass
+        elif other is None or self.code is None or self == Option.NOT_DEFINED:
+            pass
         else:
             raise TypeError("'%s' not supported between instances of 'Option(%s)' and '%s'" % (
                 op, self.__code_type.__name__,
                 'Option(%s)' % type_other.__name__ if other_is_option else type_other.__name__
             ))
 
-    def __cmp__(self, other):
-        return self.code.__cmp__(other.code if isinstance(other, Option) else other)
+    # if six.PY2:
+    #     def __cmp__(self, other):
+    #         self.__op_cmp_check__('==', other)
+    #
+    #         if isinstance(other, Option):
+    #             if self.code == other.code and self.name == other.name and self.text == other.text:
+    #                 return 0
+    #             elif self.code < other.code:
+    #                 return -1
+    #             else:
+    #                 return 1
+    #         else:
+    #             return self.code.__cmp__(other)
 
     def __eq__(self, other):
         self.__op_cmp_check__('==', other)
 
-        return self.code == (other.code if isinstance(other, Option) else other)
+        if isinstance(other, Option):
+            return self.code == other.code and self.name == other.name and self.text == other.text
+        else:
+            return self.code == other
+
+    def __hash__(self):
+        return super(Option, self).__hash__()
 
     def __lt__(self, other):
         self.__op_cmp_check__('<', other)

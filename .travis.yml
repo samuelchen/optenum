@@ -1,0 +1,27 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+virtualenv:
+  system_site_packages: true
+env:
+#  - DJANGO_VERSION=1.11.18
+install:
+  # Build/test dependencies
+  - pip install -r requirements.txt
+  - pip install -r requirements.test.txt
+git:
+  depth: 3
+  quiet: true
+branches:
+  only:
+    - master
+  except:
+    # no for now
+before_script:
+  # no for now
+script:
+  - python -m unittest discover

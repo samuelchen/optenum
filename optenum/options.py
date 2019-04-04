@@ -9,28 +9,21 @@ import logging
 log = logging.getLogger(__name__)
 
 
-# class OptionGroup(object):
-#
-#     def __init__(self, *options):
-#         group = []
-#         for opt in options:
-#             group.append(opt)
-#
-#         self._group = group
-#
-#     def get_option_list(self):
-#         return self._group
-
-
 class OptionsMeta(type):
 
     def __new__(cls, name, bases, namespace):
         instance = super(OptionsMeta, cls).__new__(cls, name, bases, namespace)
         name_options_mapping = {}
         code_options_mapping = {}
-        # groups_mapping = {}
 
-        ignore_invalid_name = getattr(cls, '__IGNORE_INVALID_NAME__', False) is True
+        ignore_invalid_name = getattr(cls, '__IGNORE_INVALID_NAME__', False)
+        order_by = getattr(cls, '__ORDER_BY__', None)
+
+        if not isinstance(ignore_invalid_name, bool):
+            raise ValueError("'__IGNORE_INVALID_NAME__' must be bool type True or False.")
+
+        if order_by not in ['code', 'name', None]:
+            raise ValueError("'__ORDER_BY__' only supported on `code` and `name` field")
 
         if name != 'Options':
             for attr, val in namespace.items():
@@ -45,11 +38,6 @@ class OptionsMeta(type):
                 else:
                     if attr in name_options_mapping.keys() or hasattr(cls, attr):
                         raise AttributeError('Duplicated attribute "%s" found' % attr)
-
-                    # if isinstance(val, OptionGroup):
-                    #     groups_mapping[attr] = val
-                    #     setattr(cls, attr, val.get_option_list())
-                    #     continue
 
                     if isinstance(val, Option):
                         if val.name != attr:
@@ -83,34 +71,7 @@ class OptionsMeta(type):
 
         return instance
 
-
-@six.add_metaclass(OptionsMeta)     # py2,3 compatibility
-class Options(object):
-    """
-    Derive class `Options` to implement your enum/options.
-    e.g
-    ```
-        # simple way
-        class EnumFruits(Options):
-            APPLE = 1
-            ORANGE = 2
-            BANANA = 3
-
-        # option `code` + `text` description in tuple
-        class DoorStates(Options):
-            OPEN = 'O', 'Door is opened'
-            CLOSED = ('C', 'Door is closed')
-            IN_OPENING = 'IO'
-            IN_CLOSING = 'IC'
-    ```
-    """
-
-    __order_by_code = 'code'
-    __order_by_name = 'name'
-
-    # _G = OptionGroup
-
-    @classmethod
+    # Options class methods or properties
     def __get_name_options_mapping(cls):
         """
         Dict of {'name': option} mapping.
@@ -120,7 +81,6 @@ class Options(object):
         """
         return cls.__name_options_mapping__
 
-    @classmethod
     def __get_code_options_mapping(cls):
         """
         Dict of {'code': option} mapping
@@ -129,116 +89,133 @@ class Options(object):
         """
         return cls.__code_options_mapping__
 
-    @classmethod
-    def lookup_by_code(cls, option_code):
-        assert isinstance(option_code, Option.AVAILABLE_CODE_TYPES)
+    def __getitem__(cls, item):
+        return cls.__get_name_options_mapping()[item]
 
-        return cls.__get_code_options_mapping().get(option_code, Option.NOT_DEFINED)
+    def __setitem__(cls, key, value):
+        raise TypeError("'%s' class does not support item assignment" % cls.__name__)
 
-    @classmethod
-    def lookup_by_name(cls, option_name):
-        assert isinstance(option_name, six.string_types)
+    def __delitem__(cls, key):
+        raise TypeError("'%s' class does not support item deletion" % cls.__name__)
 
-        return cls.__get_name_options_mapping().get(option_name, Option.NOT_DEFINED)
-
-    @classmethod
-    def get_order_by_kw_code(cls):
-        """
-        Get the keyword to order by "code"
-        :return:
-        """
-        return cls.__order_by_code
-
-    @classmethod
-    def get_order_by_kw_name(cls):
-        """
-        Get the keyword to order by "name"
-        :return:
-        """
-        return cls.__order_by_name
-
-    @classmethod
-    def get_option_list(cls, order_by=None, reverse=False):
-        """
-        Get all options as a list
-        :param order_by: Sort order. by 'name' or 'code' (use get_order_by_kw_xxx() to get).
-        :param reverse: Whether sort is reversed. Only available when `order_by` is not set correctly.
-        :return: List of `Option` object.
-        """
-        assert order_by in [None, cls.get_order_by_kw_code(), cls.get_order_by_kw_name()], \
-            'Incorrect order_by'
-
-        options = cls.__get_name_options_mapping()
-
-        if order_by == cls.get_order_by_kw_code():
-            lst = sorted(options.values(), key=lambda o: o.code, reverse=reverse)
-        elif order_by == cls.get_order_by_kw_name():
-            lst = sorted(options.values(), key=lambda o: o.name, reverse=reverse)
+    def __contains__(cls, item):
+        if isinstance(item, Option):
+            return item in cls.__get_name_options_mapping().values()
         else:
-            lst = options.values()
+            return item in cls.__get_code_options_mapping().keys()
 
+    def get(cls, key, default=Option.NOT_DEFINED):
+        return cls.__get_name_options_mapping().get(key, default)
+
+    @property
+    def codes(cls):
+        """List of `code`s"""
+        return list(cls.__get_code_options_mapping().keys())
+
+    @property
+    def names(cls):
+        """List of `name`s"""
+        return list(cls.__get_name_options_mapping().keys())
+
+    @property
+    def all(cls):
+        """List of `Option` objects"""
+        return list(cls.__get_name_options_mapping().values())
+
+    @property
+    def tuples(cls):
+        """List of (`name`, `code`, `text`) tuples"""
+        return [(o.name, o.code, o.text) for o in cls.__get_name_options_mapping().values()]
+
+    @property
+    def items(cls):
+        """Dict of {`name`: Option} mapping"""
+        return {o.name: o for o in cls.__get_name_options_mapping().values()}
+
+    def get_list(cls, *fields):
+        """
+        List of *fields.
+        :param fields: Field name of `Option`. Such as `code`, (`name`, `code`), [`code`, `name`, `text`] or etc.
+        :return: List of *fields tuple or single value.
+        """
+
+        if len(fields) == 0:
+            raise ValueError("No fields argument found.")
+
+        found_fields = set()
+        for f in fields:
+            if f not in ['code', 'name', 'text']:
+                raise NameError(
+                    "'%s' is incorrect Option field. Only 'code', 'name' and 'text' are available." % str(f))
+            if f in found_fields:
+                raise ValueError("Duplicated fields '%s' found." % str(f))
+            found_fields.add(f)
+
+        lst = []
+        for o in cls.__get_name_options_mapping().values():
+            value = []
+            for f in fields:
+                value.append(getattr(o, f))
+            lst.append(value[0] if len(value) == 1 else tuple(value))
         return lst
 
-    @classmethod
-    def get_code_list(cls, order_by=None, reverse=False):
+    def get_dict(cls, key_field, *fields):
         """
-        Get all option codes as a list
-        :param order_by: Sort order. by 'name' or 'code' (use get_keyword_order_by_xx() to get).
-        :param reverse: Whether sort is reversed. Only available when `order_by` is not set correctly.
-        :return: List of codes.
+        Retrieve as dict of {key_field: *fields} mapping. If `fields` is single value, returns `{key:value}` mapping.
+                If `fields` is **tuple**, returns `{key: (tuple of fields value)}` mapping.
+        :param key_field: name of Option field for dict key. Only `code` and `name` are available.
+        :param fields: Names of Option field for values. Can be tuple or single value. Impact value part of return dict.
+        :return: dict of {key_field: *fields} mapping.
         """
-        options = cls.get_option_list(order_by=order_by, reverse=reverse)
-        codes = [o.code for o in options]
-        return codes
+        if key_field not in ['code', 'name']:
+            raise NameError("'%s' is not correct key field. Only 'code' and 'name' can be key field." % str(key_field))
 
-    @classmethod
-    def get_name_list(cls, order_by=None, reverse=False):
-        """
-        Get all option names as a list
-        :param order_by: Sort order. by 'name' or 'code' (use get_keyword_order_by_xx() to get).
-        :param reverse: Whether sort is reversed. Only available when `order_by` is not set correctly.
-        :return: List of names.
-        """
-        options = cls.get_option_list(order_by=order_by, reverse=reverse)
-        names = [o.name for o in options]
-        return names
+        if len(fields) == 0:
+            raise ValueError("No fields argument found.")
 
-    @classmethod
-    def get_code_name_list(cls, order_by=None, reverse=False, code_first=True):
-        """
-        Get all option tuple (name, code) or (code, name) as a list
-        :param order_by: Sort order. by 'name' or 'code' (use get_keyword_order_by_xx() to get).
-        :param reverse: Whether sort is reversed. Only available when `order_by` is not set correctly.
-        :param code_first: Bool. If true, `code` will be at first (code, name). Otherwise, `name` first (name, code).
-        :return: List of (code, name) or (name, code) tuples.
-        """
-        options = cls.get_option_list(order_by=order_by, reverse=reverse)
+        found_fields = set()
+        for f in fields:
+            if f not in ['code', 'name', 'text']:
+                raise NameError(
+                    "'%s' is incorrect Option field. Only 'code', 'name' and 'text' are available." % str(f))
+            if f in found_fields:
+                raise ValueError("Duplicated fields '%s' found." % str(f))
+            found_fields.add(f)
 
-        if code_first:
-            lst = [(o.code, o.name) for o in options]
-        else:
-            lst = [(o.name, o.code) for o in options]
+        items = {}
+        for o in cls.__get_name_options_mapping().values():
+            key = getattr(o, key_field)
+            value = []
+            for f in fields:
+                value.append(getattr(o, f))
+            items[key] = value[0] if len(value) == 1 else tuple(value)
 
-        return lst
+        return items
 
-    @classmethod
-    def get_code_text_list(cls, order_by=None, reverse=False, code_first=True):
-        """
-        Get all option tuple (code, text) or (text, code) as a list
-        :param order_by: Sort order. by 'name' or 'code' (use get_keyword_order_by_xx() to get).
-        :param reverse: Whether sort is reversed. Only available when `order_by` is not set correctly.
-        :param code_first: Bool. If true, `code` will be at first (code, name). Otherwise, `name` first (name, code).
-        :return: List of (code, text) or (text, code) tuples.
-        """
 
-        options = cls.get_option_list(order_by=order_by, reverse=reverse)
+@six.add_metaclass(OptionsMeta)     # py2,3 compatibility
+class Options(object):
+    """
+    Derive class `Options` to implement your enum/options.
+    e.g
+    ```
+        # simple way
+        class Fruit(Options):
+            APPLE = 1
+            ORANGE = 2
+            BANANA = 3
 
-        if code_first:
-            lst = [(o.code, o.text) for o in options]
-        else:
-            lst = [(o.text, o.code) for o in options]
+        # option `code` + `text` description in tuple
+        class DoorState(Options):
+            OPEN = 'O', 'Door is opened'
+            CLOSED = ('C', 'Door is closed')
+            IN_OPENING = 'IO'
+            IN_CLOSING = 'IC'
+    ```
+    """
 
-        return lst
+    pass
 
 
 __all__ = ('Options', )
+

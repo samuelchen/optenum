@@ -392,16 +392,11 @@ Logic operators are not override. They will perform as the object logic operator
     >>> Fruit.BANANA != Favorite.BANANA
     True
   ```
-  
-  * cmp (Python 2)
-  
-        Commented as its not required in Python 2.7 and 3
 
-  __cmp__ is only used in Python 2. `!=`, or `sort` will use `__cmp__` to compare objects.
+  * is
   
-  Comparing 2 `Option` objects means to compares their `code`.
-  Comparing an `Option` objects with another type object means to compare the `Option.code` to the other object.
-  
+  No special implementation for `is`. It behaves as `object`.  
+
   * Greater(Equal), Less(Equal), >, >=, <, <=
   
   Comparing 2 `Option` objects means to compares their `code`.
@@ -409,7 +404,7 @@ Logic operators are not override. They will perform as the object logic operator
 
   * and, or
   
-  No special implementation for `and` and `or` operators. It behaviors as its.
+  No special implementation for `and` and `or` operators. It behaves as its.
   
   ```python
     >>> Fruit.APPLE and Favorite.BANANA

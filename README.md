@@ -88,7 +88,7 @@ pip install six optenum
 
 3. Operators
 
-    `Option` support some operators. See more in [operators.md](./docs/operators.md).
+    `Option` support some operators. See more in [operators.md](https://github.com/samuelchen/optenum/blob/master/docs/operators.md).
     
     ```
     >>> class Favorite(Options):
@@ -176,8 +176,7 @@ Although Python 3.7 comes with [data classes](https://docs.python.org/3/whatsnew
 
 # Boolean for `Option`
 
-`bool`
-`is`
+No special implementation. It behaves as `object` is.
 
 # Operators for `Option`
 
@@ -186,7 +185,7 @@ like `if active_state == MyOption.RUNNING.code:  # Do something ...` to check th
 are override. Then we could use `if active_state == MyOption.RUNNING:`, `x = MyOption.RUNNING + 1` and so on to
 directly reference to its real value.
 
-See doc [operators.md](./docs/operators.md) for override operators.
+See doc [operators.md](https://github.com/samuelchen/optenum/blob/master/docs/operators.md) for override operators.
 
 # Collections for `Options`
 

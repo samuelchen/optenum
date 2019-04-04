@@ -4,7 +4,6 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-  - "3.7"
 virtualenv:
   system_site_packages: true
 env:
@@ -24,4 +23,7 @@ branches:
 before_script:
   # no for now
 script:
-  - python -m unittest discover
+#  - python -m unittest discover
+  - coverage run --omit=optenum/mysix.py --source=./optenum/ -m unittest
+after_script:
+  - coverage report

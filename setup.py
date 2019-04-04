@@ -1,7 +1,14 @@
 """A setuptools based setup module.
-See:
+From:
 https://packaging.python.org/guides/distributing-packages-using-setuptools/
 https://github.com/pypa/sampleproject
+
+
+Test PyPi:
+  - clean: rm dist/*; rm -rf ./build/*
+  - build: python3 setup.py sdist bdist_wheel
+  - upload: python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  - install: pip install --index-url https://test.pypi.org/simple/ optenum
 """
 
 # Always prefer setuptools over distutils
@@ -28,9 +35,9 @@ setup(
     # package, this name will be registered for you. It will determine how
     # users can install this project, e.g.:
     #
-    # $ pip install sampleproject
+    # $ pip install optenum
     #
-    # And where it will live on PyPI: https://pypi.org/project/sampleproject/
+    # And where it will live on PyPI: https://pypi.org/project/optenum/
     #
     # There are some restrictions on what makes a valid project name
     # specification here:
@@ -98,7 +105,7 @@ setup(
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        'Topic :: Software Development :: Libraries :: Python Modules',
 
         # Pick your license as you wish
         'License :: OSI Approved :: MIT License',

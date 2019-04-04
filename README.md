@@ -9,6 +9,20 @@ Name "**optenum**" comes from '**opt**ion' + '**enum**eration'.
 
 Compatible with `Python 2.7+` and `Python 3.0+`.
 
+# Install
+
+Python 3.x, 2.7
+
+```bash
+pip install optenum
+```
+
+For those probably missing `six` module:
+
+```bash
+pip install six optenum
+```
+
 # Quick start
 
 1. Simple as Enum type
@@ -59,12 +73,12 @@ Compatible with `Python 2.7+` and `Python 3.0+`.
     class EnumCellPhone(Options):
         APPLE = 1
         SAMSUNG = Option(2, name='SAMSUNG')
-        HUAWEI = 3, 'Huawei cellphone'
+        HUAWEI = 3, 'Huawei cellphone'     # tuple annotation. name = code, text
     
     
     class DoorState(Options):
-        OPEN = 'O', 'Door is opened'
-        CLOSED = ('C', 'Door is closed')
+        OPEN = 'O', 'Door is opened'       # tuple annotation. name = code, text
+        CLOSED = ('C', 'Door is closed')   # tuple annotation, too.
         IN_OPENING = 'IO'
         IN_CLOSING = 'IC'
     
@@ -214,8 +228,10 @@ Some flags can be used to make some simple configuration to your Options.
     Underscore `_` leading attributes and any functions will be ignored so that you can add your own attributes and 
     functions. The following example is valid definition.
     
-    ```
-    Class MyEnum(Options):
+    ```python
+    from optenum import Options
+
+    class MyEnum(Options):
         FOO = 1
         BAR = 2
         
@@ -227,8 +243,10 @@ Some flags can be used to make some simple configuration to your Options.
     
     But if an attributes is not uppercase (all characters), it will be treat as invalid `Option` and cause exception.
     
-    ```
-    Class MyEnum(Options):
+    ```python
+    from optenum import Options
+
+    class MyEnum(Options):
         FOO = 1
         BAR = 2
         
@@ -238,8 +256,10 @@ Some flags can be used to make some simple configuration to your Options.
     If you want this available, add `__IGNORE_INVALID_NAME__` to your class like below. The exception will ignored.
     But to be noticed, it still not an `Option`.
   
-    ```
-    Class MyEnum(Options):
+    ```python
+    from optenum import Options
+
+    class MyEnum(Options):
         __IGNORE_INVALID_NAME__ = True
         
         FOO = 1

@@ -3,12 +3,19 @@ From:
 https://packaging.python.org/guides/distributing-packages-using-setuptools/
 https://github.com/pypa/sampleproject
 
+common:
+  - clean: rm ./dist/*; rm -rf ./build/*
+  - build: python3 setup.py sdist bdist_wheel
+  - twine: python3 -m pip install --user --upgrade twine
 
 Test PyPi:
-  - clean: rm dist/*; rm -rf ./build/*
-  - build: python3 setup.py sdist bdist_wheel
   - upload: python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
   - install: pip install --index-url https://test.pypi.org/simple/ optenum
+
+
+PyPi Release:
+  - upload: python3 -m twine upload dist/*
+  - install: pip install optenum
 """
 
 # Always prefer setuptools over distutils

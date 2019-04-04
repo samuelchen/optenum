@@ -21,7 +21,7 @@ branches:
   except:
     # no for now
 before_script:
-  - cd optenum
+#  - cd optenum
 script:
 #  - python -m unittest discover
   - echo $PWD

@@ -1,5 +1,8 @@
 # Optenum
 
+[![Travis](https://img.shields.io/travis/samuelchen/optenum.svg?branch=master?style=flat-square)](https://travis-ci.org/samuelchen/optenum)
+
+
 A missing Python Option/Enum library which supports enum code, name, text, even (code, name) tuple list and so on.
 
 Name "**optenum**" comes from '**opt**ion' + '**enum**eration'.

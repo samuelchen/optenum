@@ -1,4 +1,4 @@
-# Supported `Option` Operators
+# Supported Operators of `Option`
 
   `Option.code` is the real value of the enum/option item. Somehow we need to use codes 
   like `if active_state == MyOption.RUNNING ...` to check the status. For convenience using it, some of the operators
@@ -176,6 +176,7 @@ ValueError: invalid literal for int() with base 10: 'F'
   * Multiple *
   
     Available when `Option.code` is **number** type and the `other` variable is also **number** type.
+    Or `Option.code` is **string** type and the `other` variable is **integer** type.
   
   ```python
 >>> Fruit.PEAR * 2

@@ -1,7 +1,8 @@
-.idea
+.idea/
 *.sqlite3
-tmp
-temp
+tmp/
+temp/
+.vscode/
 
 TODO
 

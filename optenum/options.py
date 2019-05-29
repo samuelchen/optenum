@@ -104,7 +104,7 @@ class OptionsMeta(type):
         else:
             return item in cls.__get_code_options_mapping().keys()
 
-    def get(cls, key, default=Option.NOT_DEFINED):
+    def get(cls, key, default=None):
         return cls.__get_name_options_mapping().get(key, default)
 
     @property

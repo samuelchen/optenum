@@ -1,5 +1,8 @@
 # Supported Operators of `Option`
 
+        Option is refactored. An Option object is now same as its code.
+        This doc need to be re-written.
+
   `Option.code` is the real value of the enum/option item. Somehow we need to use codes 
   like `if active_state == MyOption.RUNNING ...` to check the status. For convenience using it, some of the operators
   are override. 

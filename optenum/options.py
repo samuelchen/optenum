@@ -16,8 +16,8 @@ class OptionsMeta(type):
         name_options_mapping = {}
         code_options_mapping = {}
 
-        ignore_invalid_name = getattr(cls, '__IGNORE_INVALID_NAME__', False)
-        order_by = getattr(cls, '__ORDER_BY__', None)
+        ignore_invalid_name = namespace.get('__IGNORE_INVALID_NAME__', False)
+        order_by = namespace.get('__ORDER_BY__', None)
 
         if not isinstance(ignore_invalid_name, bool):
             raise ValueError("'__IGNORE_INVALID_NAME__' must be bool type True or False.")

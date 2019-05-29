@@ -195,6 +195,22 @@ class TestCustomizedOptions(unittest.TestCase):
         self.assertEqual(len(apple), 2)
         self.assertIn(Fruit.APPLE, apple)
 
+    def test_ignore_invalid_name(self):
+
+        # invalid name
+        try:
+            class Bar(Options):
+                Invalid= (1, 2)
+        except Exception as e:
+            self.assertIsInstance(e, AttributeError)
+
+        # ignore invalid name
+        class Foo(Options):
+            __IGNORE_INVALID_NAME__ = True
+            Ignored = (1, 2)
+
+        self.assertEqual(Foo.Ignored, (1, 2))
+
 
 if __name__ == '__main__':
     unittest.main()

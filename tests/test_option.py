@@ -29,6 +29,7 @@ class Favorite(object):
     APPLE = Option(1, 'APPLE', 'Apple')
     BANANA = Option(2, 'BANANA', 'Banana')
 
+
 store = {
     1: '10 Apples',         # Apple = 1
     2: '20 Bananas',        # Banana = 2 

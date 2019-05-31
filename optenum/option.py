@@ -18,6 +18,10 @@ class OptionPseudo(object):
         self.tag_added = None
         self.tag_removed = None
 
+    @property
+    def tags(self):
+        return tuple(self._tags)
+
     def add_tag(self, tag):
         self._tags.add(tag)
         if callable(self.tag_added):
@@ -28,9 +32,8 @@ class OptionPseudo(object):
         if callable(self.tag_removed):
             self.tag_removed(tag)
 
-    @property
-    def tags(self):
-        return tuple(self._tags)
+    def get_text(self):
+        return self.text if self.text is not None else self.name
 
 
 class OptionMeta(type):

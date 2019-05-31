@@ -1,7 +1,9 @@
 
 # 1.1.2
 
-Support Option tags and access tagged options as collection
+Support Option tags 
+Support access tagged options as group (tuple)
+fix "Option.get_text is missed" issue.
 
 # 1.1.1
 

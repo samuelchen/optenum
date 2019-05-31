@@ -1,8 +1,14 @@
 # Optenum
 
+[![Travis](https://img.shields.io/github/languages/top/samuelchen/optenum.svg?style=flat-square)](https://pypi.org/project/optenum/)
 [![Travis](https://img.shields.io/travis/samuelchen/optenum.svg?branch=master?style=flat-square)](https://travis-ci.org/samuelchen/optenum)
+[![Travis](https://img.shields.io/pypi/pyversions/optenum.svg?style=flat-square)](https://pypi.org/project/optenum/)
+[![Travis](https://img.shields.io/pypi/v/optenum.svg?style=flat-square)](https://pypi.org/project/optenum/)
+[![Travis](https://img.shields.io/pypi/status/optenum.svg?style=flat-square)](https://pypi.org/project/optenum/)
+[![Travis](https://img.shields.io/pypi/format/optenum.svg?style=flat-square)](https://pypi.org/project/optenum/)
 
 
+	
 A missing Python Option/Enum library which supports enum code, name, text, even (code, name) tuple list and so on.
 
 Name "**optenum**" comes from '**opt**ion' + '**enum**eration'.
@@ -168,24 +174,50 @@ Although Python 3.7 comes with [data classes](https://docs.python.org/3/whatsnew
 
 # Type converting for `Option`
 
-`str()` or implicit string converting will convert `Option.code` to string type and returns.
+    since v1.1.1
 
-`repr()` will returns the object as string format of `<Option code=??? name=??? text=???>`.
+An `Option` instance will be constructed dynamically. Optenum will construct a new sub type 
+`Option(?)` class based on your option value(`code`) to initialize the new instance object.  
 
-`int`, `float` will be performed on `Option.code` and returns the value or raises corresponding exception.
+For example, `Option(code=1, name='APPLE', text='an apple')` will construct a class `Option(int)`.
+The `int` is your `code`'s type. If your option is for a string, e.g. `Option('A', 'ADMIN', 'Administration user')`,
+an `Option(str)` class will be constructed internally.
+
+The internal `Option(?)` class is derived from either `Option` and `?` (e.g. `int`). That means you can use 
+`isinstance` to check your object. For example, says we have `apple = Option(1, 'APPLE', 'an apple')`. Then
+ `isinstance(apple, int)` is `True`. And `isinstance(apple, Option)` is `True`, too. So that you can use
+ your option as its value(`code`) is such in `dict` as key and so on.
+ 
+
+    Deprecated since v1.1.0
+    
+    `str()` or implicit string converting will convert `Option.code` to string type and returns. ~
+    
+    `repr()` will returns the object as string format of `<Option code=??? name=??? text=???>`.
+    
+    `int`, `float` will be performed on `Option.code` and returns the value or raises corresponding exception.
 
 # Boolean for `Option`
 
-No special implementation. It behaves as `object` is.
+    Deprecated since v1.1.0
+    No special implementation. It behaves as `object` is.
+
+# Group and tags 
+
+See [this doc](https://github.com/samuelchen/optenum/blob/master/docs/tag-and-group.md).
 
 # Operators for `Option`
 
-`Option.code` is the real value of the enum/option item. Somehow we need to use codes 
-like `if active_state == MyOption.RUNNING.code:  # Do something ...` to check the status. For convenience using it, some of the operators
-are override. Then we could use `if active_state == MyOption.RUNNING:`, `x = MyOption.RUNNING + 1` and so on to
-directly reference to its real value.
+Since v1.1.1, an `Option` behaves as its value(`code`) is. So it will support all operators its `code` supports.
 
-See doc [operators.md](https://github.com/samuelchen/optenum/blob/master/docs/operators.md) for override operators.
+    Deprecated since v1.1.0
+    
+    `Option.code` is the real value of the enum/option item. Somehow we need to use codes 
+    like `if active_state == MyOption.RUNNING.code:  # Do something ...` to check the status. For convenience using it, some of the operators
+    are override. Then we could use `if active_state == MyOption.RUNNING:`, `x = MyOption.RUNNING + 1` and so on to
+    directly reference to its real value.
+    
+    See doc [operators.md](https://github.com/samuelchen/optenum/blob/master/docs/operators.md) for override operators.
 
 # Collections for `Options`
 
@@ -212,10 +244,12 @@ We could also access the following collections from within an Options class.
   `fields` specify the value tuple combined of which Option fields such as (`name`, `text`) or `name`.
   if fields is tuple, the value is tuple. if fields is single filed, value is single field.
 
-`in` operator could check if a `code` in `Options`. e.g. `if Fruit.APPLE in Fruit`.
-The `Option.name` will not work. e.g. `if 'APPLE' in Fruit` will got `False`. 
-If you want to check if name in `Options`), use collection instead. 
-e.g. `if 'APPLE' in Fruit.names`.
+    Deprecated since v1.1.0
+    
+    `in` operator could check if a `code` in `Options`. e.g. `if Fruit.APPLE in Fruit`.
+    The `Option.name` will not work. e.g. `if 'APPLE' in Fruit` will got `False`. 
+    If you want to check if name in `Options`), use collection instead. 
+    e.g. `if 'APPLE' in Fruit.names`.
 
 
 # Configuration

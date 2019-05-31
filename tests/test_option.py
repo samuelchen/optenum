@@ -53,6 +53,14 @@ class TestOption(unittest.TestCase):
         self.assertIsInstance(opt, Option)
         self.assertTrue(issubclass(type(opt), Option))
 
+    def test_get_text(self):
+        opt = Option(code=1, name='OPT')
+        self.assertEqual(opt.get_text(), 'OPT')
+        opt = Option(code=1, name='OPT', text='')
+        self.assertEqual(opt.get_text(), '')
+        opt.text = 'An Option'
+        self.assertEqual(opt.get_text(), 'An Option')
+
     def test_option_invalid_code_type(self):
         self.assertRaises(TypeError, Option, *([1, 2, 3], ))
         self.assertRaises(TypeError, Option, *({'foo': 'bar'}, ''))

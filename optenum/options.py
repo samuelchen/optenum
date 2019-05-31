@@ -9,10 +9,19 @@ import logging
 log = logging.getLogger(__name__)
 
 
+class OptionGroup(list):
+
+    def add(self, opt):
+        super(OptionGroup, self).append(opt)
+
+    def remove(self, opt):
+        super(OptionGroup, self).remove(opt)
+
+
 class OptionsMeta(type):
 
-    def __new__(cls, name, bases, namespace):
-        instance = super(OptionsMeta, cls).__new__(cls, name, bases, namespace)
+    def __new__(mcs, name, bases, namespace):
+        instance = super(OptionsMeta, mcs).__new__(mcs, name, bases, namespace)
         name_options_mapping = {}
         code_options_mapping = {}
 
@@ -36,7 +45,7 @@ class OptionsMeta(type):
                         if not ignore_invalid_name:
                             raise AttributeError('Option name must be uppercase. Attribute "%s" is not.' % attr)
                 else:
-                    if attr in name_options_mapping.keys() or hasattr(cls, attr):
+                    if attr in name_options_mapping.keys() or hasattr(mcs, attr):
                         raise AttributeError('Duplicated attribute "%s" found' % attr)
 
                     if isinstance(val, Option):
@@ -51,6 +60,8 @@ class OptionsMeta(type):
                             opt = Option(code=val[0], name=attr)
                         elif len(val) == 2:
                             opt = Option(code=val[0], name=attr, text=str(val[1]))
+                        elif len(val) == 3:
+                            opt = Option(code=val[0], name=attr, text=str(val[1]), tags=val[2])
                         else:
                             raise ValueError('Option code can only be (code, text) tuple or list. name is not needed.')
                     elif isinstance(val, Option.AVAILABLE_CODE_TYPES):
@@ -65,11 +76,52 @@ class OptionsMeta(type):
                     setattr(instance, attr, opt)
                     name_options_mapping[attr] = opt
                     code_options_mapping[opt.code] = opt
+                    mcs.__scan_option_tags_for_group(instance, opt)
 
         instance.__name_options_mapping__ = name_options_mapping
         instance.__code_options_mapping__ = code_options_mapping
 
         return instance
+
+    def __scan_option_tags_for_group(cls, opt):
+        """
+        Scan all tags in a given Option object and add the object to appropriate group of the tag.
+        :param opt: Option object
+        :return:
+        """
+
+        def add_option_to_group(tag):
+            __tag = '__%s' % tag
+            group = getattr(cls, __tag, None)
+            if group is not None:
+                if isinstance(group, OptionGroup):
+                    group.add(opt)
+                else:
+                    raise ValueError('Tag "%s" is duplicated as attribute of "%s"'
+                                     % (tag, cls.__name__))
+            else:
+                group = OptionGroup()
+                group.add(opt)
+                setattr(cls, __tag, group)
+            setattr(cls, tag, tuple(group))
+
+        def remove_option_from_group(tag):
+            __tag = '__%s' % tag
+            group = getattr(cls, __tag, None)
+            if group is not None:
+                if isinstance(group, OptionGroup):
+                    group.remove(opt)
+                else:
+                    raise ValueError('No options are grouped in with "%s" in "%s"' % (tag, cls.__name__))
+            else:
+                raise ValueError('Option group for tag "%s" is not existing in "%s"' % (tag, cls.__name__))
+            setattr(cls, tag, tuple(group))
+
+        for tag in opt.tags:
+            add_option_to_group(tag)
+
+        opt.tag_added = add_option_to_group
+        opt.tag_removed = remove_option_from_group
 
     # Options class methods or properties
     def __get_name_options_mapping(cls):

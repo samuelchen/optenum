@@ -12,7 +12,25 @@ AVAILABLE_CODE_TYPES_STR = ', '.join(t.__name__ for t in AVAILABLE_CODE_TYPES)
 
 
 class OptionPseudo(object):
-    pass
+
+    def __init__(self, o):
+        self._tags = set()
+        self.tag_added = None
+        self.tag_removed = None
+
+    def add_tag(self, tag):
+        self._tags.add(tag)
+        if callable(self.tag_added):
+            self.tag_added(tag)
+
+    def remove_tag(self, tag):
+        self._tags.remove(tag)
+        if callable(self.tag_removed):
+            self.tag_removed(tag)
+
+    @property
+    def tags(self):
+        return tuple(self._tags)
 
 
 class OptionMeta(type):
@@ -31,7 +49,7 @@ class OptionMeta(type):
 
         return cls_instance
 
-    def __call__(cls, code, name, text=None):
+    def __call__(cls, code, name, text=None, tags=None):
 
         if code is None or name is None:
             raise ValueError('code or name can not be None')
@@ -49,12 +67,24 @@ class OptionMeta(type):
         if not ((code is None and name is None and text is None) or (code is not None and name is not None)):
             raise ValueError('Option code and name must be not None unless code, name and text are all None.')
 
+        if tags is not None and not isinstance(tags, (tuple, list)):
+            raise ValueError('"tags" must be a tuple or list of strings.')
+
         cls_code = type(code)
         cls_option = type('Option(%s)' % cls_code.__name__, (cls_code, OptionPseudo), {})
         obj_option = cls_option(code)
         obj_option.code = code
         obj_option.name = name
         obj_option.text = text
+
+        if tags is not None:
+            tags = set(tags)
+            for tag in tags:
+                if not isinstance(tag, six.string_types):
+                    raise ValueError('"tags" must be a tuple or list of strings. "%s" is not a string object.' % tag)
+                if not (tag.isalpha() and is_identifier(tag)):
+                    raise ValueError('Tags must be alphanumeric or "_"  and start with alphabet.')
+                obj_option.add_tag(tag)
 
         return obj_option
 

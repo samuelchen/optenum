@@ -211,6 +211,35 @@ class TestCustomizedOptions(unittest.TestCase):
 
         self.assertEqual(Foo.Ignored, (1, 2))
 
+    def test_tags_groups(self):
+
+        class Foo(Options):
+            A = 1, None, ['bar']
+            B = 2, 'B is 2', ['foo']
+            C = 'C', 'C is letter', ('foo', 'bar')
+            D = 'd', 'day'
+
+        self.assertEqual(Foo.foo, (Foo.B, Foo.C))
+        self.assertEqual(Foo.foo, (2, 'C'))
+        self.assertEqual(Foo.foo, (Foo.B, 'C'))
+        self.assertEqual(Foo.foo, (2, Foo.C))
+        self.assertIn(Foo.C, Foo.foo)
+        self.assertIn(Foo.C, Foo.bar)
+        self.assertEqual(Foo.foo + Foo.bar, (2, 'C', 1, 'C'))
+        self.assertEqual(Foo.foo + Foo.bar, (Foo.B, 'C', 1, Foo.C))
+
+        Foo.D.add_tag('bar')
+        self.assertEqual(Foo.bar, (1, 'C', 'd'))
+        Foo.C.remove_tag('bar')
+        self.assertEqual(Foo.bar, (1, Foo.D))
+
+        Foo.C.remove_tag('foo')
+        self.assertEqual(Foo.foo, (Foo.B, ))
+        self.assertEqual(Foo.C.tags, ())
+
+        Foo.B.remove_tag('foo')
+        self.assertEqual(Foo.foo, ())
+
 
 if __name__ == '__main__':
     unittest.main()

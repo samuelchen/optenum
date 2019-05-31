@@ -1,4 +1,8 @@
 
+# 1.1.2
+
+Support Option tags and access tagged options as collection
+
 # 1.1.1
 
 Fix issue that `__IGNORE_INVALID_NAME__` does not work.

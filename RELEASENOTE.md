@@ -1,18 +1,24 @@
 
-# 1.1.2
+# v1.1.3
 
-Support Option tags 
-Support access tagged options as group (tuple)
-fix "Option.get_text is missed" issue.
+* Tagged option group support construct as class attribute and support +, -
+* fix "random ordered options in group" issue
+* fix "tag name checking" issue
 
-# 1.1.1
+# v1.1.2
 
-Fix issue that `__IGNORE_INVALID_NAME__` does not work.
+* Support Option tags 
+* Support access tagged options as group (tuple)
+* fix "Option.get_text is missed" issue.
 
-# 1.1.0
+# v1.1.1
 
-Change `Option` to make its instance object same as its `code`. 
+* Fix issue that `__IGNORE_INVALID_NAME__` does not work.
 
-# 1.0.0
+# v1.1.0
 
-General Available
+* Change `Option` to make its instance object same as its `code`. 
+
+# v1.0.0
+
+* General Available

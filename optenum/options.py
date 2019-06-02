@@ -1,5 +1,5 @@
 """
-Options represents an set of option items (enumerations). It is a list of options/enum entries.
+Options represents an set of option items (enumerations). It can also represent as a collection of options/enum entries.
 """
 
 import six
@@ -10,6 +10,15 @@ log = logging.getLogger(__name__)
 
 
 class OptionGroup(list):
+
+    def __init__(self, *args):
+        n = len(args)
+        if n == 0:
+            super(OptionGroup, self).__init__()
+        elif n == 1:
+            super(OptionGroup, self).__init__(args[0])
+        else:
+            super(OptionGroup, self).__init__(args)
 
     def add(self, opt):
         super(OptionGroup, self).append(opt)
@@ -48,35 +57,47 @@ class OptionsMeta(type):
                     if attr in name_options_mapping.keys() or hasattr(mcs, attr):
                         raise AttributeError('Duplicated attribute "%s" found' % attr)
 
-                    if isinstance(val, Option):
-                        if val.name != attr:
-                            raise ValueError('Option name of option %s must be same as attribute "%s"' % (val, attr))
-                        else:
-                            opt = val
-                    elif isinstance(val, (list, tuple)):
-                        if len(val) == 0:
-                            raise ValueError('Option code can not be empty list or tuple')
-                        elif len(val) == 1:
-                            opt = Option(code=val[0], name=attr)
-                        elif len(val) == 2:
-                            opt = Option(code=val[0], name=attr, text=str(val[1]))
-                        elif len(val) == 3:
-                            opt = Option(code=val[0], name=attr, text=str(val[1]), tags=val[2])
-                        else:
-                            raise ValueError('Option code can only be (code, text) tuple or list. name is not needed.')
-                    elif isinstance(val, Option.AVAILABLE_CODE_TYPES):
-                        opt = Option(code=val, name=attr)
+                    if isinstance(val, OptionGroup):
+                        # grouping options
+                        for code in val:
+                            if isinstance(code, (tuple, list)):
+                                code = code[0]
+                            opt = code_options_mapping.get(code, None)
+                            if opt is None or not isinstance(opt, Option):
+                                raise SyntaxError('%s is not available Option of %s' % (code, instance.__name__))
+                            assert callable(opt.tag_added)
+                            assert callable(opt.tag_removed)
+                            opt.add_tag(attr)
                     else:
-                        raise AttributeError('"%s" is uppercase attribute but its value can not be converted to Option.'
-                                             % attr)
+                        if isinstance(val, Option):
+                            if val.name != attr:
+                                raise ValueError('Option name of option %s must be same as attribute "%s"' % (val, attr))
+                            else:
+                                opt = val
+                        elif isinstance(val, (list, tuple)):
+                            if len(val) == 0:
+                                raise ValueError('Option code can not be empty list or tuple')
+                            elif len(val) == 1:
+                                opt = Option(code=val[0], name=attr)
+                            elif len(val) == 2:
+                                opt = Option(code=val[0], name=attr, text=str(val[1]))
+                            elif len(val) == 3:
+                                opt = Option(code=val[0], name=attr, text=str(val[1]), tags=val[2])
+                            else:
+                                raise ValueError('Tuple/list style Option accept only 3 arguments (code, text, tags).' 
+                                                 '"name" is same as attribute an not required.')
+                        elif isinstance(val, Option.AVAILABLE_CODE_TYPES):
+                            opt = Option(code=val, name=attr)
+                        else:
+                            raise TypeError('"%s" can not be converted to Option.' % attr)
 
-                    if opt.code in code_options_mapping.keys():
-                        raise ValueError('Duplicated code "%s" found' % opt.code)
+                        if opt.code in code_options_mapping.keys():
+                            raise ValueError('Duplicated code "%s" found' % opt.code)
 
-                    setattr(instance, attr, opt)
-                    name_options_mapping[attr] = opt
-                    code_options_mapping[opt.code] = opt
-                    mcs.__scan_option_tags_for_group(instance, opt)
+                        setattr(instance, attr, opt)
+                        name_options_mapping[attr] = opt
+                        code_options_mapping[opt.code] = opt
+                        mcs.__scan_option_tags_for_group(instance, opt)
 
         instance.__name_options_mapping__ = name_options_mapping
         instance.__code_options_mapping__ = code_options_mapping
@@ -90,32 +111,32 @@ class OptionsMeta(type):
         :return:
         """
 
-        def add_option_to_group(tag):
-            __tag = '__%s' % tag
-            group = getattr(cls, __tag, None)
+        def add_option_to_group(atag):
+            __group = '__%s' % atag
+            group = getattr(cls, __group, None)
             if group is not None:
                 if isinstance(group, OptionGroup):
                     group.add(opt)
                 else:
                     raise ValueError('Tag "%s" is duplicated as attribute of "%s"'
-                                     % (tag, cls.__name__))
+                                     % (atag, cls.__name__))
             else:
                 group = OptionGroup()
                 group.add(opt)
-                setattr(cls, __tag, group)
-            setattr(cls, tag, tuple(group))
+                setattr(cls, __group, group)
+            setattr(cls, atag, tuple(group))
 
-        def remove_option_from_group(tag):
-            __tag = '__%s' % tag
-            group = getattr(cls, __tag, None)
+        def remove_option_from_group(atag):
+            __group = '__%s' % atag
+            group = getattr(cls, __group, None)
             if group is not None:
                 if isinstance(group, OptionGroup):
                     group.remove(opt)
                 else:
-                    raise ValueError('No options are grouped in with "%s" in "%s"' % (tag, cls.__name__))
+                    raise ValueError('No options are grouped in with "%s" in "%s"' % (atag, cls.__name__))
             else:
-                raise ValueError('Option group for tag "%s" is not existing in "%s"' % (tag, cls.__name__))
-            setattr(cls, tag, tuple(group))
+                raise ValueError('Option group for tag "%s" is not existing in "%s"' % (atag, cls.__name__))
+            setattr(cls, atag, tuple(group))
 
         for tag in opt.tags:
             add_option_to_group(tag)
@@ -269,5 +290,5 @@ class Options(object):
     pass
 
 
-__all__ = ('Options', )
+__all__ = ('Options', 'OptionGroup')
 

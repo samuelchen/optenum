@@ -14,21 +14,22 @@ AVAILABLE_CODE_TYPES_STR = ', '.join(t.__name__ for t in AVAILABLE_CODE_TYPES)
 class OptionPseudo(object):
 
     def __init__(self, o):
-        self._tags = set()
+        self.__tags = set()
         self.tag_added = None
         self.tag_removed = None
 
     @property
     def tags(self):
-        return tuple(self._tags)
+        """Generator of tags"""
+        return (tag for tag in self.__tags)
 
     def add_tag(self, tag):
-        self._tags.add(tag)
+        self.__tags.add(tag)
         if callable(self.tag_added):
             self.tag_added(tag)
 
     def remove_tag(self, tag):
-        self._tags.remove(tag)
+        self.__tags.remove(tag)
         if callable(self.tag_removed):
             self.tag_removed(tag)
 
@@ -81,12 +82,13 @@ class OptionMeta(type):
         obj_option.text = text
 
         if tags is not None:
-            tags = set(tags)
             for tag in tags:
                 if not isinstance(tag, six.string_types):
                     raise ValueError('"tags" must be a tuple or list of strings. "%s" is not a string object.' % tag)
-                if not (tag.isalpha() and is_identifier(tag)):
-                    raise ValueError('Tags must be alphanumeric or "_"  and start with alphabet.')
+                if len(tag) == 0:
+                    raise ValueError('A tag can not be empty')
+                if not is_identifier(tag) or tag.startswith('_') or not tag.isupper():
+                    raise ValueError('Tags must be uppercase alphanumeric or "_" and must starts with alphabet.')
                 obj_option.add_tag(tag)
 
         return obj_option

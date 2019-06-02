@@ -23,9 +23,9 @@ Features:
 from __future__ import absolute_import
 from .version import __version__
 from .option import Option
-from .options import Options
+from .options import Options, OptionGroup
 
-__all__ = ('Option', 'Options', '__version__')
+__all__ = ('Option', 'Options', 'OptionGroup' '__version__')
 
 __copyright__ = "Copyright (c) 2019 Samuel Chen (Chen Wei)"
 __license__ = "MIT"

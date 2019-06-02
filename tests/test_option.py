@@ -53,6 +53,26 @@ class TestOption(unittest.TestCase):
         self.assertIsInstance(opt, Option)
         self.assertTrue(issubclass(type(opt), Option))
 
+    # def test_option_tags(self):
+    #     opt = Option(1, 'FOO', tags=['foo', 'Bar_1', 'ba1z', 'QUX'])
+    #     self.assertIn('foo', opt.tags)
+    #     self.assertIn('Bar_1', opt.tags)
+    #     self.assertIn('ba1z', opt.tags)
+    #     self.assertIn('QUX', opt.tags)
+    #
+    #     def _test_tag_name(tag):
+    #         return Option(1, 'FOO', tags=[tag, ])
+    #
+    #     self.assertRaises(ValueError, _test_tag_name, '1a')
+    #     self.assertRaises(ValueError, _test_tag_name, 'a-b')
+    #     self.assertRaises(ValueError, _test_tag_name, ' a')
+    #     self.assertRaises(ValueError, _test_tag_name, 'a b')
+    #     self.assertRaises(ValueError, _test_tag_name, 'ab ')
+    #     self.assertRaises(ValueError, _test_tag_name, 'a.b')
+    #     self.assertRaises(ValueError, _test_tag_name, '')
+    #     self.assertRaises(ValueError, _test_tag_name, '_foo')
+    #     self.assertRaises(ValueError, _test_tag_name, '_BAR')
+
     def test_get_text(self):
         opt = Option(code=1, name='OPT')
         self.assertEqual(opt.get_text(), 'OPT')

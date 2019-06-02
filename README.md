@@ -312,7 +312,10 @@ Some flags can be used to make some simple configuration to your Options.
 *namedtuple* is also a good way to define enum/options. But it has not enough features
 you may required such as *collection*, *operator*, *compare*, *text* and so on.
 
-* To be added
+* Why only uppercase allowed for Option name ?
+
+Because you can define other none-option attributes if sets `__IGNORE_INVALID_NAME__` to `True`.
+And enumerations commonly are defined with uppercase identifier.
 
 # Contributors
 

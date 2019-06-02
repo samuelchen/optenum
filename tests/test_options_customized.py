@@ -1,5 +1,5 @@
 import unittest
-from optenum import Option, Options
+from optenum import Option, Options, OptionGroup as G
 
 
 class Fruit(Options):
@@ -214,31 +214,36 @@ class TestCustomizedOptions(unittest.TestCase):
     def test_tags_groups(self):
 
         class Foo(Options):
-            A = 1, None, ['bar']
-            B = 2, 'B is 2', ['foo']
-            C = 'C', 'C is letter', ('foo', 'bar')
+            A = 1, None, ['BAR']
+            B = 2, 'B is 2', ['FOO']
+            C = 'C', 'C is letter', ('FOO', 'BAR')
             D = 'd', 'day'
 
-        self.assertEqual(Foo.foo, (Foo.B, Foo.C))
-        self.assertEqual(Foo.foo, (2, 'C'))
-        self.assertEqual(Foo.foo, (Foo.B, 'C'))
-        self.assertEqual(Foo.foo, (2, Foo.C))
-        self.assertIn(Foo.C, Foo.foo)
-        self.assertIn(Foo.C, Foo.bar)
-        self.assertEqual(Foo.foo + Foo.bar, (2, 'C', 1, 'C'))
-        self.assertEqual(Foo.foo + Foo.bar, (Foo.B, 'C', 1, Foo.C))
+            BAZ = G(B, D)
 
-        Foo.D.add_tag('bar')
-        self.assertEqual(Foo.bar, (1, 'C', 'd'))
-        Foo.C.remove_tag('bar')
-        self.assertEqual(Foo.bar, (1, Foo.D))
+        self.assertEqual(Foo.FOO, (Foo.B, Foo.C))
+        self.assertEqual(Foo.FOO, (2, 'C'))
+        self.assertEqual(Foo.FOO, (Foo.B, 'C'))
+        self.assertEqual(Foo.FOO, (2, Foo.C))
+        self.assertIn(Foo.C, Foo.FOO)
+        self.assertIn(Foo.C, Foo.BAR)
+        self.assertEqual(Foo.FOO + Foo.BAR, (2, 'C', 1, 'C'))
+        self.assertEqual(Foo.FOO + Foo.BAR, (Foo.B, 'C', 1, Foo.C))
 
-        Foo.C.remove_tag('foo')
-        self.assertEqual(Foo.foo, (Foo.B, ))
-        self.assertEqual(Foo.C.tags, ())
+        self.assertEqual(Foo.BAZ, (Foo.B, Foo.D))
+        self.assertEqual(Foo.BAR + Foo.BAZ, (1, 'C', 2, 'd'))
 
-        Foo.B.remove_tag('foo')
-        self.assertEqual(Foo.foo, ())
+        Foo.D.add_tag('BAR')
+        self.assertEqual(Foo.BAR, (1, 'C', 'd'))
+        Foo.C.remove_tag('BAR')
+        self.assertEqual(Foo.BAR, (1, Foo.D))
+
+        Foo.C.remove_tag('FOO')
+        self.assertEqual(Foo.FOO, (Foo.B, ))
+        self.assertEqual(tuple(Foo.C.tags), ())
+
+        Foo.B.remove_tag('FOO')
+        self.assertEqual(Foo.FOO, ())
 
 
 if __name__ == '__main__':

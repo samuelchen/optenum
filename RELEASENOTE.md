@@ -1,4 +1,8 @@
 
+# v1.1.4
+
+* Fix issue when creating option group as class attribute
+
 # v1.1.3
 
 * Tagged option group support construct as class attribute and support +, -

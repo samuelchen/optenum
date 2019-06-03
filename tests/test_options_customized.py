@@ -245,6 +245,30 @@ class TestCustomizedOptions(unittest.TestCase):
         Foo.B.remove_tag('FOO')
         self.assertEqual(Foo.FOO, ())
 
+    def test_grouping_single_option(self):
+
+        class Foo(Options):
+            A = 1
+            B = 2, 'B is 2'
+            C = 'C', 'C is letter', ['FOO']
+            D = Option('d', name='D')
+            E = Option('e1', 'E', 'Earth')
+            F = Option('15', 'F', 'Finish', ['FOO'])
+
+            G1 = G(A)
+            G2 = G(B)
+            G3 = G(C)
+            G4 = G(D)
+            G5 = G(E)
+            G6 = G(F)
+
+        self.assertEqual(Foo.G1, (Foo.A, ))
+        self.assertEqual(Foo.G2, (Foo.B, ))
+        self.assertEqual(Foo.G3, (Foo.C, ))
+        self.assertEqual(Foo.G4, (Foo.D, ))
+        self.assertEqual(Foo.G5, (Foo.E, ))
+        self.assertEqual(Foo.G6, (Foo.F, ))
+
 
 if __name__ == '__main__':
     unittest.main()

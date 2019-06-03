@@ -13,11 +13,19 @@ log = logging.getLogger(__name__)
 class OptionGroup(list):
 
     def __init__(self, *args):
+        # to ensure args are in list, consider the following
+        #
+        # class Foo(Options):
+        #     A = 1
+        #     B = 2, 'B is 2'
+        #
+        #     G1 = OptionGroup(A)       # should get args [ 1 ]
+        #     G2 = OptionGroup(B)       # should get args [ (2, 'B is 2') ]
+        #
+
         n = len(args)
         if n == 0:
             super(OptionGroup, self).__init__()
-        elif n == 1:
-            super(OptionGroup, self).__init__(args[0])
         else:
             super(OptionGroup, self).__init__(args)
 
@@ -106,7 +114,7 @@ class OptionsMeta(type):
                         code = code[0]
                     opt = code_options_mapping.get(code, None)
                     if opt is None or not isinstance(opt, Option):
-                        raise SyntaxError('%s is not available Option of %s' % (code, instance.__name__))
+                        raise SyntaxError('"%s" is not available Option of %s' % (code, instance.__name__))
                     assert callable(opt.tag_added)
                     assert callable(opt.tag_removed)
                     opt.add_tag(attr)

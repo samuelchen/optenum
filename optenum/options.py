@@ -3,6 +3,7 @@ Options represents an set of option items (enumerations). It can also represent 
 """
 
 import six
+from collections import OrderedDict
 from .option import Option
 import logging
 
@@ -28,6 +29,12 @@ class OptionGroup(list):
 
 
 class OptionsMeta(type):
+
+    @classmethod
+    def __prepare__(mcs, name, bases, **kwargs):
+
+        # hack for python 3.4 and 3.5. It returns OrderedDict by default after 3.6.
+        return OrderedDict()
 
     def __new__(mcs, name, bases, namespace):
         instance = super(OptionsMeta, mcs).__new__(mcs, name, bases, namespace)

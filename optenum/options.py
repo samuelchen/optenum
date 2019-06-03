@@ -33,6 +33,7 @@ class OptionsMeta(type):
         instance = super(OptionsMeta, mcs).__new__(mcs, name, bases, namespace)
         name_options_mapping = {}
         code_options_mapping = {}
+        groups = {}
 
         ignore_invalid_name = namespace.get('__IGNORE_INVALID_NAME__', False)
         order_by = namespace.get('__ORDER_BY__', None)
@@ -58,16 +59,8 @@ class OptionsMeta(type):
                         raise AttributeError('Duplicated attribute "%s" found' % attr)
 
                     if isinstance(val, OptionGroup):
-                        # grouping options
-                        for code in val:
-                            if isinstance(code, (tuple, list)):
-                                code = code[0]
-                            opt = code_options_mapping.get(code, None)
-                            if opt is None or not isinstance(opt, Option):
-                                raise SyntaxError('%s is not available Option of %s' % (code, instance.__name__))
-                            assert callable(opt.tag_added)
-                            assert callable(opt.tag_removed)
-                            opt.add_tag(attr)
+                        groups[attr] = val
+                        continue
                     else:
                         if isinstance(val, Option):
                             if val.name != attr:
@@ -98,6 +91,18 @@ class OptionsMeta(type):
                         name_options_mapping[attr] = opt
                         code_options_mapping[opt.code] = opt
                         mcs.__scan_option_tags_for_group(instance, opt)
+
+            for attr, val in groups.items():
+                # grouping options
+                for code in val:
+                    if isinstance(code, (tuple, list)):
+                        code = code[0]
+                    opt = code_options_mapping.get(code, None)
+                    if opt is None or not isinstance(opt, Option):
+                        raise SyntaxError('%s is not available Option of %s' % (code, instance.__name__))
+                    assert callable(opt.tag_added)
+                    assert callable(opt.tag_removed)
+                    opt.add_tag(attr)
 
         instance.__name_options_mapping__ = name_options_mapping
         instance.__code_options_mapping__ = code_options_mapping

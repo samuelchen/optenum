@@ -1,7 +1,7 @@
 
 # v1.1.4
 
-* Fix issue when creating option group as class attribute
+* Fix option not found issue when creating option group as class attribute (class attributes creation is not in order)
 
 # v1.1.3
 

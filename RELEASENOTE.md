@@ -2,6 +2,7 @@
 # v1.1.4
 
 * Fix option not found issue when creating option group as class attribute (class attributes creation is not in order)
+* Fix option attributes order in python 3.4 & 3.5
 
 # v1.1.3
 

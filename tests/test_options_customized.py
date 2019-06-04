@@ -59,6 +59,9 @@ class DoorState(Options):
 
 class TestCustomizedOptions(unittest.TestCase):
 
+    def raiseAssert(self, e):
+        raise AssertionError('Should raise %s' % e)
+
     def test_enum(self):
         self.assertEqual(Fruit.APPLE, 1)
         self.assertEqual(Fruit.APPLE.name, 'APPLE')
@@ -77,6 +80,8 @@ class TestCustomizedOptions(unittest.TestCase):
                 foo = 1
                 Bar = 2
                 BAZ_1 = 3
+
+            self.raiseAssert(AttributeError)
         except Exception as e:
             self.assertIsInstance(e, AttributeError)
 
@@ -85,6 +90,7 @@ class TestCustomizedOptions(unittest.TestCase):
             class MyOptions(Options):
                 FOO = 1
                 BAR = Option(code=2, name='Bar')        # name must be 'BAR'
+            self.raiseAssert(ValueError)
         except Exception as e:
             self.assertIsInstance(e, ValueError)
 
@@ -93,6 +99,8 @@ class TestCustomizedOptions(unittest.TestCase):
             class MyOptions(Options):
                 FOO = 1
                 FOO = Option(code=2, name='Bar')        # duplicated name
+
+            self.raiseAssert(ValueError)
         except Exception as e:
             self.assertIsInstance(e, ValueError)
 
@@ -100,6 +108,7 @@ class TestCustomizedOptions(unittest.TestCase):
             class MyOptions(Options):
                 FOO = 1
                 BAR = Option(code=1, name='Bar')        # duplicated code
+            self.raiseAssert(ValueError)
         except Exception as e:
             self.assertIsInstance(e, ValueError)
 
@@ -201,6 +210,7 @@ class TestCustomizedOptions(unittest.TestCase):
         try:
             class Bar(Options):
                 Invalid= (1, 2)
+            self.raiseAssert(AttributeError)
         except Exception as e:
             self.assertIsInstance(e, AttributeError)
 
@@ -268,6 +278,66 @@ class TestCustomizedOptions(unittest.TestCase):
         self.assertEqual(Foo.G4, (Foo.D, ))
         self.assertEqual(Foo.G5, (Foo.E, ))
         self.assertEqual(Foo.G6, (Foo.F, ))
+
+    def test_group_plus(self):
+
+        class Foo(Options):
+            A = 1
+            B = 2, 'B is 2'
+            C = 'C', 'C is letter', ['FOO']
+            D = Option('d', name='D')
+            E = Option('e1', 'E', 'Earth')
+            F = Option('15', 'F', 'Finish', ['FOO'])
+
+            G1 = G(A, B)
+            G2 = G(B, C)
+            G3 = G(C, D)
+            G4 = G(D, E, F)
+
+            GA = G1 + G2
+            GB = G1 + G3
+            GC = G2 + G4
+            # GD = G1 + G2 + A
+            # GD = G(G(G1 + G2), G(G3 + B))
+            GE = G2 + G3 + G(E)
+            GF = G(GA + G3 + F)
+
+        self.assertEqual(Foo.GA, (Foo.A, Foo.B, Foo.C))
+        self.assertEqual(Foo.GB, (Foo.A, Foo.B, Foo.C, Foo.D))
+        self.assertEqual(Foo.GC, (Foo.B, Foo.C, Foo.D, Foo.E, Foo.F))
+        self.assertEqual(Foo.GE, (Foo.B, Foo.C, Foo.D, Foo.E))
+        self.assertEqual(Foo.GF, (Foo.A, Foo.B, Foo.C, Foo.D, Foo.F))
+
+        try:
+            class Bar(Options):
+                A = 1
+                B = 2, 'B is 2'
+                C = 'C', 'C is letter', ['FOO']
+
+                G1 = G(A, B)
+                G2 = G(B, C)
+
+                GD = G1 + G2 + A
+
+            self.raiseAssert(TypeError)
+        except Exception as e:
+            self.assertIsInstance(e, TypeError)
+
+        try:
+            class Baz(Options):
+                A = 1
+                B = 2, 'B is 2'
+                C = 'C', 'C is letter', ['FOO']
+
+                G1 = G(A, B)
+                G2 = G(B, C)
+                G3 = G(C)
+
+                GD = G(G(G1 + G2), G(G3 + B))
+
+            self.raiseAssert(TypeError)
+        except Exception as e:
+            self.assertIsInstance(e, TypeError)
 
 
 if __name__ == '__main__':

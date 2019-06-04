@@ -1,7 +1,11 @@
 
 # v1.1.6
 
+<<<<<<< HEAD
 * Group supports +(plus) operator
+=======
+* Group supports + operator
+>>>>>>> 0dfeeb19331c42364e451cbd877ac8394f8e3a12
 
 # v1.1.5
 

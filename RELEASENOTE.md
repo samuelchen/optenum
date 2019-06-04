@@ -1,4 +1,8 @@
 
+# v1.1.6
+
+* Group supports + operator
+
 # v1.1.5
 
 * Fix issue of creating single option group as class attribute

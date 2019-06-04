@@ -42,6 +42,9 @@ store = {
 
 class TestOption(unittest.TestCase):
 
+    def raiseAssert(self, e):
+        raise AssertionError('Should raise %s' % e)
+
     # def test_not_defined(self):
     #     self.assertIsInstance(Option.NOT_DEFINED, Option)
     #     self.assertIs(Option.NOT_DEFINED.code, None)
@@ -53,25 +56,12 @@ class TestOption(unittest.TestCase):
         self.assertIsInstance(opt, Option)
         self.assertTrue(issubclass(type(opt), Option))
 
-    # def test_option_tags(self):
-    #     opt = Option(1, 'FOO', tags=['foo', 'Bar_1', 'ba1z', 'QUX'])
-    #     self.assertIn('foo', opt.tags)
-    #     self.assertIn('Bar_1', opt.tags)
-    #     self.assertIn('ba1z', opt.tags)
-    #     self.assertIn('QUX', opt.tags)
-    #
-    #     def _test_tag_name(tag):
-    #         return Option(1, 'FOO', tags=[tag, ])
-    #
-    #     self.assertRaises(ValueError, _test_tag_name, '1a')
-    #     self.assertRaises(ValueError, _test_tag_name, 'a-b')
-    #     self.assertRaises(ValueError, _test_tag_name, ' a')
-    #     self.assertRaises(ValueError, _test_tag_name, 'a b')
-    #     self.assertRaises(ValueError, _test_tag_name, 'ab ')
-    #     self.assertRaises(ValueError, _test_tag_name, 'a.b')
-    #     self.assertRaises(ValueError, _test_tag_name, '')
-    #     self.assertRaises(ValueError, _test_tag_name, '_foo')
-    #     self.assertRaises(ValueError, _test_tag_name, '_BAR')
+    def test_option_tags(self):
+        opt = Option(1, 'FOO', tags=['FOO', 'BAR_1', 'BA1Z', 'QUX'])
+        self.assertIn('FOO', opt.tags)
+        self.assertIn('BAR_1', opt.tags)
+        self.assertIn('BA1Z', opt.tags)
+        self.assertIn('QUX', opt.tags)
 
     def test_get_text(self):
         opt = Option(code=1, name='OPT')
@@ -136,10 +126,12 @@ class TestOption(unittest.TestCase):
         self.assertLess(Ball.BASKETBALL, 'T')
         try:
             self.assertLess(Ball.FOOTBALL, Fruit.BANANA)
+            self.raiseAssert((TypeError, AssertionError))
         except Exception as e:
             self.assertIsInstance(e, (TypeError, AssertionError))
         try:
             self.assertLess(Ball.FOOTBALL, 2)
+            self.raiseAssert((TypeError, AssertionError))
         except Exception as e:
             self.assertIsInstance(e, (TypeError, AssertionError))
         # self.assertRaises(TypeError, Ball.FOOTBALL.__lt__, Fruit.BANANA)
@@ -154,10 +146,12 @@ class TestOption(unittest.TestCase):
 
         try:
             self.assertLessEqual(Ball.FOOTBALL, Fruit.BANANA)
+            self.raiseAssert((TypeError, AssertionError))
         except Exception as e:
             self.assertIsInstance(e, (TypeError, AssertionError))
         try:
             self.assertLessEqual(Ball.FOOTBALL, 2)
+            self.raiseAssert((TypeError, AssertionError))
         except Exception as e:
             self.assertIsInstance(e, (TypeError, AssertionError))
 
@@ -173,10 +167,17 @@ class TestOption(unittest.TestCase):
 
         try:
             self.assertGreater(Ball.FOOTBALL, Fruit.BANANA)
+            if six.PY3:
+                # Only for PY3. Because comparision between str and int is available in Python 2.7
+                self.raiseAssert(TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
+
         try:
             self.assertGreater(Ball.FOOTBALL, 2)
+            if six.PY3:
+                # Only for PY3. Because comparision between str and int is available in Python 2.7
+                self.raiseAssert(TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
 
@@ -192,11 +193,13 @@ class TestOption(unittest.TestCase):
 
         try:
             self.assertGreaterEqual(Ball.FOOTBALL, Fruit.BANANA)
+            self.raiseAssert((TypeError, AssertionError))
         except Exception as e:
             self.assertIsInstance(e, (TypeError, AssertionError))
 
         try:
             self.assertGreaterEqual(Ball.FOOTBALL, 2.1)
+            self.raiseAssert((TypeError, AssertionError))
         except Exception as e:
             self.assertIsInstance(e, (TypeError, AssertionError))
 
@@ -210,6 +213,7 @@ class TestOption(unittest.TestCase):
         self.assertEqual(- Fruit.PEAR, 1)
         try:
             -Ball.BASKETBALL
+            self.assertIsInstance(e, TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
         # self.assertRaises(TypeError, Ball.BASKETBALL.__neg__)
@@ -220,6 +224,7 @@ class TestOption(unittest.TestCase):
         self.assertEqual(+ Fruit.APPLE, Fruit.APPLE)
         try:
             +Ball.BASKETBALL
+            self.assertIsInstance(e, TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
         # self.assertRaises(TypeError, Ball.BASKETBALL.__pos__)
@@ -247,6 +252,7 @@ class TestOption(unittest.TestCase):
         self.assertEqual(~ Fruit.PEAR, 0)
         try:
             ~ Fruit.MONGO
+            self.assertIsInstance(e, TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
         self.assertRaises(ValueError, float, Ball.BASKETBALL)
@@ -296,10 +302,12 @@ class TestOption(unittest.TestCase):
 
         try:
             Ball.BASKETBALL / 2
+            self.assertIsInstance(e, TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
         try:
             Fruit.APPLE / 0
+            self.assertIsInstance(e, ZeroDivisionError)
         except Exception as e:
             self.assertIsInstance(e, ZeroDivisionError)
 
@@ -317,14 +325,17 @@ class TestOption(unittest.TestCase):
 
         try:
             Ball.BASKETBALL // 2
+            self.assertIsInstance(e, TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
         try:
             Fruit.APPLE // 0
+            self.assertIsInstance(e, ZeroDivisionError)
         except Exception as e:
             self.assertIsInstance(e, ZeroDivisionError)
         try:
             3 // Fruit.WATERMELON
+            self.assertIsInstance(e, ZeroDivisionError)
         except Exception as e:
             self.assertIsInstance(e, ZeroDivisionError)
         # self.assertRaises(TypeError, Ball.BASKETBALL.__floordiv__, *(2, ))
@@ -345,14 +356,17 @@ class TestOption(unittest.TestCase):
         self.assertEqual(divmod(Fruit.BANANA, 0.5), (6.0, 0.0))
         try:
             divmod(Fruit.BANANA, '2')
+            self.assertIsInstance(e, TypeError)
         except Exception as e:
             self.assertIsInstance(e, TypeError)
         try:
             divmod(Fruit.APPLE, 0)
+            self.assertIsInstance(e, ZeroDivisionError)
         except Exception as e:
             self.assertIsInstance(e, ZeroDivisionError)
         try:
             divmod(3, Fruit.WATERMELON)
+            self.assertIsInstance(e, ZeroDivisionError)
         except Exception as e:
             self.assertIsInstance(e, ZeroDivisionError)
         # self.assertRaises(TypeError, divmod, *(Fruit.BANANA, 0.5))

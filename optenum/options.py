@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 class OptionGroup(list):
 
     def __init__(self, *args):
+
         # to ensure args are in list, consider the following
         #
         # class Foo(Options):
@@ -23,17 +24,36 @@ class OptionGroup(list):
         #     G2 = OptionGroup(B)       # should get args [ (2, 'B is 2') ]
         #
 
-        n = len(args)
-        if n == 0:
-            super(OptionGroup, self).__init__()
-        else:
-            super(OptionGroup, self).__init__(args)
+        super(OptionGroup, self).__init__()
+        for arg in args:
+            if isinstance(arg, OptionGroup):
+                for a in arg:
+                    if a not in self:
+                        self.append(a)
+            else:
+                if arg not in self:
+                    self.append(arg)
 
     def add(self, opt):
-        super(OptionGroup, self).append(opt)
+        if isinstance(opt, Option):
+            super(OptionGroup, self).append(opt)
+        else:
+            raise TypeError('Only "%s" can be added into "%s". "%s" is "%s".'
+                            % (Option.__name__, OptionGroup.__name__, opt, type(opt)))
 
     def remove(self, opt):
         super(OptionGroup, self).remove(opt)
+
+    def __add__(self, other):
+        if isinstance(other, OptionGroup):
+            r = OptionGroup(*super(OptionGroup, self).__add__(other))
+            return r
+        elif isinstance(other, Option):
+            r = OptionGroup(*super(OptionGroup, self).__add__([other]))
+            return r
+        else:
+            raise TypeError('Can not add "%s"<%s> to %s. Please explicitly convert it to "%s" or "%s"'
+                            % (other, type(other).__name__, OptionGroup.__name__, Option.__name__, OptionGroup.__name__))
 
 
 class OptionsMeta(type):

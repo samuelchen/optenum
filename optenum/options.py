@@ -108,9 +108,9 @@ class OptionsMeta(type):
                             elif len(val) == 1:
                                 opt = Option(code=val[0], name=attr)
                             elif len(val) == 2:
-                                opt = Option(code=val[0], name=attr, text=str(val[1]))
+                                opt = Option(code=val[0], name=attr, text=val[1])
                             elif len(val) == 3:
-                                opt = Option(code=val[0], name=attr, text=str(val[1]), tags=val[2])
+                                opt = Option(code=val[0], name=attr, text=val[1], tags=val[2])
                             else:
                                 raise ValueError('Tuple/list style Option accept only 3 arguments (code, text, tags).' 
                                                  '"name" is same as attribute an not required.')

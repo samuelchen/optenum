@@ -1,11 +1,15 @@
 
+# v1.1.8
+
+* Do not convert Option.text to string. It may cause `gettext_lazy` executed so that some times error occurs in Django.
+
+# v1.1.7
+
+* (lost information)
+
 # v1.1.6
 
-<<<<<<< HEAD
 * Group supports +(plus) operator
-=======
-* Group supports + operator
->>>>>>> 0dfeeb19331c42364e451cbd877ac8394f8e3a12
 
 # v1.1.5
 

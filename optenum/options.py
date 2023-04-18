@@ -327,7 +327,10 @@ class Options(object):
     ```
     """
 
-    pass
+    @classmethod
+    def choices(cls):
+        # for django choices
+        return cls.get_list('code', 'text')
 
 
 __all__ = ('Options', 'OptionGroup')
